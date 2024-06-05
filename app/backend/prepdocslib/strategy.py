@@ -23,7 +23,7 @@ class SearchInfo:
         self.index_name_list = index_name_list
 
     def create_search_client(self, index_name) -> SearchClient:
-       # return SearchClient(endpoint=self.endpoint, index_name=self.index_name, credential=self.credential)
+        # return SearchClient(endpoint=self.endpoint, index_name=self.index_name, credential=self.credential)
         return SearchClient(endpoint=self.endpoint, index_name=index_name, credential=self.credential)
 
     def create_search_index_client(self) -> SearchIndexClient:
@@ -44,8 +44,8 @@ class Strategy(ABC):
     Abstract strategy for ingesting documents into a search service. It has a single setup step to perform any required initialization, and then a run step that actually ingests documents into the search service.
     """
 
-    async def setup(self):
+    async def setup(self, search_info: SearchInfo):
         raise NotImplementedError
 
-    async def run(self):
+    async def run(self, search_info: SearchInfo):
         raise NotImplementedError

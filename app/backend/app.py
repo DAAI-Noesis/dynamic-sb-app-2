@@ -437,7 +437,8 @@ async def setup_clients():
         enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
     )
     auth_helper_T1 = AuthenticationHelper(
-        search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T1),
+        search_index=(await search_index_client.get_index(AZURE_SEARCH_INDEX_T1)) if AZURE_USE_AUTHENTICATION else None,
+        # search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T1),
         use_authentication=AZURE_USE_AUTHENTICATION,
         server_app_id=AZURE_SERVER_APP_ID,
         server_app_secret=AZURE_SERVER_APP_SECRET,
@@ -448,7 +449,8 @@ async def setup_clients():
         enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
     )
     auth_helper_T2 = AuthenticationHelper(
-        search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T2)
+        search_index=(await search_index_client.get_index(AZURE_SEARCH_INDEX_T2)) if AZURE_USE_AUTHENTICATION else None,
+        # search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T2),
         use_authentication=AZURE_USE_AUTHENTICATION,
         server_app_id=AZURE_SERVER_APP_ID,
         server_app_secret=AZURE_SERVER_APP_SECRET,
@@ -459,7 +461,8 @@ async def setup_clients():
         enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
     )
     auth_helper_T3 = AuthenticationHelper(
-        search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T3)
+        search_index=(await search_index_client.get_index(AZURE_SEARCH_INDEX_T3)) if AZURE_USE_AUTHENTICATION else None,
+        # search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T3),
         use_authentication=AZURE_USE_AUTHENTICATION,
         server_app_id=AZURE_SERVER_APP_ID,
         server_app_secret=AZURE_SERVER_APP_SECRET,

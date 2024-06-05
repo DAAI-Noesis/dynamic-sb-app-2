@@ -208,7 +208,7 @@ def setup_image_embeddings_service(
 
 async def main(strategy: Strategy, setup_index: bool = True):
     if setup_index:
-        await strategy.setup()
+        await strategy.setup(search_info)
 
     await strategy.run(search_info)
 

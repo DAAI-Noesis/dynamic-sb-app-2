@@ -62,7 +62,7 @@ class FileStrategy(Strategy):
         self.use_acls = use_acls
         self.category = category
 
-    async def setup(self):
+    async def setup(self, search_info: SearchInfo):
         search_manager = SearchManager(
             self.search_info,
             self.search_analyzer_name,
@@ -83,15 +83,14 @@ class FileStrategy(Strategy):
                 try:
                     key = file.file_extension()
                     processor = self.file_processors.get(key)
-                   
                     # if processor is None:
                     if processor is None:
                         print(f"Skipping '{file.filename()}'.")
                         continue
-                   
+                    
                     print(f"Parsing '{file.filename()}'")
-                       
-                   
+                    
+                    
                     if "AT" in file.content.name:
                         pages = [page async for page in processor.parser.parse(content=file.content)]
                         
@@ -104,7 +103,7 @@ class FileStrategy(Strategy):
                     else: 
                         if "OSA" in file.content.name:
                             pages = [page async for page in processor.parser.parse(content=file.content)]
-                           
+                        
                             print(f"Splitting '{file.filename()}' into sections")
                             sections = [
                                 Section(split_page, content=file, category=self.category)
@@ -121,7 +120,7 @@ class FileStrategy(Strategy):
                             ]
                             index_name = search_info.index_name_list[2]
                     
-                    sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
+                    # sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
                     if sections:
                         blob_sas_uris = await self.blob_manager.upload_blob(file)
                         blob_image_embeddings: Optional[List[List[float]]] = None
