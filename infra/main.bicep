@@ -26,7 +26,7 @@ param searchServiceSkuName string // Set in main.parameters.json
 param searchIndexName string // Set in main.parameters.json
 param searchIndexName_T1 string // Set in main.parameters.json
 param searchIndexName_T2 string // Set in main.parameters.json
-param searchIndexName_T3 string // Set in main.parameters.json
+// param searchIndexName_T3 string // Set in main.parameters.json
 param searchQueryLanguage string // Set in main.parameters.json
 param searchQuerySpeller string // Set in main.parameters.json
 param searchServiceSemanticRankerLevel string // Set in main.parameters.json
@@ -283,7 +283,7 @@ module backend 'core/host/appservice.bicep' = {
       AZURE_SEARCH_INDEX: searchIndexName
       AZURE_SEARCH_INDEX_T1: searchIndexName_T1
       AZURE_SEARCH_INDEX_T2: searchIndexName_T2
-      AZURE_SEARCH_INDEX_T3: searchIndexName_T3
+      // AZURE_SEARCH_INDEX_T3: searchIndexName_T3
       AZURE_SEARCH_SERVICE: searchService.outputs.name
       AZURE_SEARCH_SEMANTIC_RANKER: actualSearchServiceSemanticRankerLevel
       AZURE_VISION_ENDPOINT: useGPT4V ? computerVision.outputs.endpoint : ''
@@ -790,7 +790,7 @@ output AZURE_DOCUMENTINTELLIGENCE_RESOURCE_GROUP string = documentIntelligenceRe
 output AZURE_SEARCH_INDEX string = searchIndexName
 output AZURE_SEARCH_INDEX_T1 string = searchIndexName_T1
 output AZURE_SEARCH_INDEX_T2 string = searchIndexName_T2
-output AZURE_SEARCH_INDEX_T3 string = searchIndexName_T3
+// output AZURE_SEARCH_INDEX_T3 string = searchIndexName_T3
 output AZURE_SEARCH_SERVICE string = searchService.outputs.name
 output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
 output AZURE_SEARCH_SEMANTIC_RANKER string = actualSearchServiceSemanticRankerLevel

@@ -73,7 +73,7 @@ class FileStrategy(Strategy):
         )
         await search_manager.create_index()
 
-    async def run(self, search_info:SearchInfo):
+    async def run(self, search_info: SearchInfo):
         search_manager = SearchManager(
             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
         )
@@ -118,7 +118,8 @@ class FileStrategy(Strategy):
                                 Section(split_page, content=file, category=self.category)
                                 for split_page in processor.splitter.split_pages(pages)
                             ]
-                            index_name = search_info.index_name_list[2]
+                            # index_name = search_info.index_name_list[2]
+                            index_name = search_info.index_name_list[1]
                     
                     # sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
                     if sections:

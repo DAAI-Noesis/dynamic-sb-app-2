@@ -65,7 +65,7 @@ class SearchManager:
         self.search_images = search_images
 
     async def create_index(self, vectorizers: Optional[List[VectorSearchVectorizer]] = None):
-       # logger.info("Ensuring search index %s exists", self.search_info.index_name)
+        # logger.info("Ensuring search index %s exists", self.search_info.index_name)
 
         async with self.search_info.create_search_index_client() as search_index_client:
             fields = [
@@ -206,7 +206,7 @@ class SearchManager:
                         await search_index_client.create_or_update_index(index_definition)
 
     async def update_content(
-        self,index_name:str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
+        self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
     ):
         MAX_BATCH_SIZE = 1000
         section_batches = [sections[i : i + MAX_BATCH_SIZE] for i in range(0, len(sections), MAX_BATCH_SIZE)]

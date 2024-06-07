@@ -68,7 +68,8 @@ fi
 --subscriptionid $AZURE_SUBSCRIPTION_ID  \
 --storageaccount "$AZURE_STORAGE_ACCOUNT" --container "$AZURE_STORAGE_CONTAINER" --storageresourcegroup $AZURE_STORAGE_RESOURCE_GROUP \
 #--searchservice "$AZURE_SEARCH_SERVICE" --index "$AZURE_SEARCH_INDEX" \
---searchservice "$AZURE_SEARCH_SERVICE" --index "$AZURE_SEARCH_INDEX" --index_t1 "$AZURE_SEARCH_INDEX_T1" --index_t2 "$AZURE_SEARCH_INDEX_T2" --index_t3 "$AZURE_SEARCH_INDEX_T3" \
+# --searchservice "$AZURE_SEARCH_SERVICE" --index "$AZURE_SEARCH_INDEX" --index_t1 "$AZURE_SEARCH_INDEX_T1" --index_t2 "$AZURE_SEARCH_INDEX_T2" --index_t3 "$AZURE_SEARCH_INDEX_T3" \
+--searchservice "$AZURE_SEARCH_SERVICE" --index "$AZURE_SEARCH_INDEX" --index_t1 "$AZURE_SEARCH_INDEX_T1" --index_t2 "$AZURE_SEARCH_INDEX_T2" \
 $searchAnalyzerNameArg \
 --openaihost "$OPENAI_HOST" --openaimodelname "$AZURE_OPENAI_EMB_MODEL_NAME" $openAiDimensionsArg \
 --openaiservice "$AZURE_OPENAI_SERVICE" --openaideployment "$AZURE_OPENAI_EMB_DEPLOYMENT"  \

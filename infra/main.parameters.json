@@ -51,13 +51,10 @@
       "value": "${AZURE_SEARCH_INDEX=gptkbindex}"
     },
     "searchIndexName_T1": {
-      "value": "${AZURE_SEARCH_INDEX=index_t1}"
+      "value": "${AZURE_SEARCH_INDEX_T1=index_t1}"
     },
     "searchIndexName_T2": {
-      "value": "${AZURE_SEARCH_INDEX=index_t2}"
-    },
-    "searchIndexName_T3": {
-      "value": "${AZURE_SEARCH_INDEX=index_t3}"
+      "value": "${AZURE_SEARCH_INDEX_T2=index_t2}"
     },
     "searchServiceName": {
       "value": "${AZURE_SEARCH_SERVICE}"

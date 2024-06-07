@@ -47,12 +47,12 @@ from config import (
     CONFIG_AUTH_CLIENT,
     CONFIG_AUTH_CLIENT_T1,
     CONFIG_AUTH_CLIENT_T2,
-    CONFIG_AUTH_CLIENT_T3,
+    # CONFIG_AUTH_CLIENT_T3,
     CONFIG_BLOB_CONTAINER_CLIENT,
     CONFIG_CHAT_APPROACH,
     CONFIG_CHAT_APPROACH_T1,
     CONFIG_CHAT_APPROACH_T2,
-    CONFIG_CHAT_APPROACH_T3,
+    # CONFIG_CHAT_APPROACH_T3,
     CONFIG_CHAT_VISION_APPROACH,
     CONFIG_GPT4V_DEPLOYED,
     CONFIG_INGESTER,
@@ -60,7 +60,7 @@ from config import (
     CONFIG_SEARCH_CLIENT,
     CONFIG_SEARCH_CLIENT_T1,
     CONFIG_SEARCH_CLIENT_T2,
-    CONFIG_SEARCH_CLIENT_T3,
+    # CONFIG_SEARCH_CLIENT_T3,
     CONFIG_SEMANTIC_RANKER_DEPLOYED,
     CONFIG_USER_BLOB_CONTAINER_CLIENT,
     CONFIG_USER_UPLOAD_ENABLED,
@@ -151,6 +151,28 @@ async def content_file(path: str, auth_claims: Dict[str, Any]):
     return await send_file(blob_file, mimetype=mime_type, as_attachment=False, attachment_filename=path)
 
 
+# @bp.route("/ask", methods=["POST"])
+# @authenticated
+# async def ask(auth_claims: Dict[str, Any]):
+#     if not request.is_json:
+#         return jsonify({"error": "request must be json"}), 415
+#     request_json = await request.get_json()
+#     context = request_json.get("context", {})
+#     context["auth_claims"] = auth_claims
+#     try:
+#         use_gpt4v = context.get("overrides", {}).get("use_gpt4v", False)
+#         approach: Approach
+#         if use_gpt4v and CONFIG_ASK_VISION_APPROACH in current_app.config:
+#             approach = cast(Approach, current_app.config[CONFIG_ASK_VISION_APPROACH])
+#         else:
+#             approach = cast(Approach, current_app.config[CONFIG_CHAT_APPROACH_T1])
+#         r = await approach.run(
+#             request_json["messages"], context=context, session_state=request_json.get("session_state")
+#         )
+#         return jsonify(r)
+#     except Exception as error:
+#         return error_response(error, "/ask")
+    
 @bp.route("/ask", methods=["POST"])
 @authenticated
 async def ask(auth_claims: Dict[str, Any]):
@@ -166,10 +188,20 @@ async def ask(auth_claims: Dict[str, Any]):
             approach = cast(Approach, current_app.config[CONFIG_ASK_VISION_APPROACH])
         else:
             approach = cast(Approach, current_app.config[CONFIG_CHAT_APPROACH_T1])
-        r = await approach.run(
-            request_json["messages"], context=context, session_state=request_json.get("session_state")
+
+        result = await approach.run(
+            request_json["messages"],
+            stream=request_json.get("stream", False),
+            context=context,
+            session_state=request_json.get("session_state"),
         )
-        return jsonify(r)
+        if isinstance(result, dict):
+            return jsonify(result)
+        else:
+            response = await make_response(format_as_ndjson(result))
+            response.timeout = None  # type: ignore
+            response.mimetype = "application/json-lines"
+            return response
     except Exception as error:
         return error_response(error, "/ask")
 
@@ -222,37 +254,37 @@ async def chat(auth_claims: Dict[str, Any]):
     except Exception as error:
         return error_response(error, "/chat")
 
-@bp.route("/chat2", methods=["POST"])
-@authenticated
-async def chat(auth_claims: Dict[str, Any]):
-    if not request.is_json:
-        return jsonify({"error": "request must be json"}), 415
-    request_json = await request.get_json()
-    context = request_json.get("context", {})
-    context["auth_claims"] = auth_claims
-    try:
-        use_gpt4v = context.get("overrides", {}).get("use_gpt4v", False)
-        approach: Approach
-        if use_gpt4v and CONFIG_CHAT_VISION_APPROACH in current_app.config:
-            approach = cast(Approach, current_app.config[CONFIG_CHAT_VISION_APPROACH])
-        else:
-            approach = cast(Approach, current_app.config[CONFIG_CHAT_APPROACH_T3])
+# @bp.route("/chat2", methods=["POST"])
+# @authenticated
+# async def chat2(auth_claims: Dict[str, Any]):
+#     if not request.is_json:
+#         return jsonify({"error": "request must be json"}), 415
+#     request_json = await request.get_json()
+#     context = request_json.get("context", {})
+#     context["auth_claims"] = auth_claims
+#     try:
+#         use_gpt4v = context.get("overrides", {}).get("use_gpt4v", False)
+#         approach: Approach
+#         if use_gpt4v and CONFIG_CHAT_VISION_APPROACH in current_app.config:
+#             approach = cast(Approach, current_app.config[CONFIG_CHAT_VISION_APPROACH])
+#         else:
+#             approach = cast(Approach, current_app.config[CONFIG_CHAT_APPROACH_T3])
 
-        result = await approach.run(
-            request_json["messages"],
-            stream=request_json.get("stream", False),
-            context=context,
-            session_state=request_json.get("session_state"),
-        )
-        if isinstance(result, dict):
-            return jsonify(result)
-        else:
-            response = await make_response(format_as_ndjson(result))
-            response.timeout = None  # type: ignore
-            response.mimetype = "application/json-lines"
-            return response
-    except Exception as error:
-        return error_response(error, "/chat2")   
+#         result = await approach.run(
+#             request_json["messages"],
+#             stream=request_json.get("stream", False),
+#             context=context,
+#             session_state=request_json.get("session_state"),
+#         )
+#         if isinstance(result, dict):
+#             return jsonify(result)
+#         else:
+#             response = await make_response(format_as_ndjson(result))
+#             response.timeout = None  # type: ignore
+#             response.mimetype = "application/json-lines"
+#             return response
+#     except Exception as error:
+#         return error_response(error, "/chat2")   
 
 
 # Send MSAL.js settings to the client UI
@@ -345,7 +377,7 @@ async def setup_clients():
     AZURE_SEARCH_INDEX = os.environ["AZURE_SEARCH_INDEX"]
     AZURE_SEARCH_INDEX_T1 = os.environ["AZURE_SEARCH_INDEX_T1"]
     AZURE_SEARCH_INDEX_T2 = os.environ["AZURE_SEARCH_INDEX_T2"]
-    AZURE_SEARCH_INDEX_T3 = os.environ["AZURE_SEARCH_INDEX_T3"]
+    # AZURE_SEARCH_INDEX_T3 = os.environ["AZURE_SEARCH_INDEX_T3"]
     # Shared by all OpenAI deployments
     OPENAI_HOST = os.getenv("OPENAI_HOST", "azure")
     OPENAI_CHATGPT_MODEL = os.environ["AZURE_OPENAI_CHATGPT_MODEL"]
@@ -406,11 +438,11 @@ async def setup_clients():
         index_name=AZURE_SEARCH_INDEX_T2,
         credential=azure_credential,
     )
-    search_client_T3 = SearchClient(
-        endpoint=f"https://{AZURE_SEARCH_SERVICE}.search.windows.net",
-        index_name=AZURE_SEARCH_INDEX_T3,
-        credential=azure_credential,
-    )
+    # search_client_T3 = SearchClient(
+    #     endpoint=f"https://{AZURE_SEARCH_SERVICE}.search.windows.net",
+    #     index_name=AZURE_SEARCH_INDEX_T3,
+    #     credential=azure_credential,
+    # )
 
     blob_container_client = ContainerClient(
         f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", AZURE_STORAGE_CONTAINER, credential=azure_credential
@@ -460,18 +492,18 @@ async def setup_clients():
         enable_global_documents=AZURE_ENABLE_GLOBAL_DOCUMENT_ACCESS,
         enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
     )
-    auth_helper_T3 = AuthenticationHelper(
-        search_index=(await search_index_client.get_index(AZURE_SEARCH_INDEX_T3)) if AZURE_USE_AUTHENTICATION else None,
-        # search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T3),
-        use_authentication=AZURE_USE_AUTHENTICATION,
-        server_app_id=AZURE_SERVER_APP_ID,
-        server_app_secret=AZURE_SERVER_APP_SECRET,
-        client_app_id=AZURE_CLIENT_APP_ID,
-        tenant_id=AZURE_AUTH_TENANT_ID,
-        require_access_control=AZURE_ENFORCE_ACCESS_CONTROL,
-        enable_global_documents=AZURE_ENABLE_GLOBAL_DOCUMENT_ACCESS,
-        enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
-    )
+    # auth_helper_T3 = AuthenticationHelper(
+    #     search_index=(await search_index_client.get_index(AZURE_SEARCH_INDEX_T3)) if AZURE_USE_AUTHENTICATION else None,
+    #     # search_index= await search_index_client.get_index(AZURE_SEARCH_INDEX_T3),
+    #     use_authentication=AZURE_USE_AUTHENTICATION,
+    #     server_app_id=AZURE_SERVER_APP_ID,
+    #     server_app_secret=AZURE_SERVER_APP_SECRET,
+    #     client_app_id=AZURE_CLIENT_APP_ID,
+    #     tenant_id=AZURE_AUTH_TENANT_ID,
+    #     require_access_control=AZURE_ENFORCE_ACCESS_CONTROL,
+    #     enable_global_documents=AZURE_ENABLE_GLOBAL_DOCUMENT_ACCESS,
+    #     enable_unauthenticated_access=AZURE_ENABLE_UNAUTHENTICATED_ACCESS,
+    # )
 
     if USE_USER_UPLOAD:
         current_app.logger.info("USE_USER_UPLOAD is true, setting up user upload feature")
@@ -494,8 +526,11 @@ async def setup_clients():
             local_html_parser=os.getenv("USE_LOCAL_HTML_PARSER", "").lower() == "true",
             search_images=USE_GPT4V,
         )
+        # search_info = await setup_search_info(
+        #     search_service=AZURE_SEARCH_SERVICE, index_name=AZURE_SEARCH_INDEX, azure_credential=azure_credential
+        # )
         search_info = await setup_search_info(
-            search_service=AZURE_SEARCH_SERVICE, index_name=AZURE_SEARCH_INDEX, azure_credential=azure_credential
+            search_service=AZURE_SEARCH_SERVICE, index_name_list=[AZURE_SEARCH_INDEX_T1, AZURE_SEARCH_INDEX_T2], azure_credential=azure_credential
         )
         text_embeddings_service = setup_embeddings_service(
             azure_credential=azure_credential,
@@ -546,12 +581,12 @@ async def setup_clients():
     current_app.config[CONFIG_SEARCH_CLIENT] = search_client
     current_app.config[CONFIG_SEARCH_CLIENT_T1] = search_client_T1
     current_app.config[CONFIG_SEARCH_CLIENT_T2] = search_client_T2
-    current_app.config[CONFIG_SEARCH_CLIENT_T3] = search_client_T3
+    # current_app.config[CONFIG_SEARCH_CLIENT_T3] = search_client_T3
     current_app.config[CONFIG_BLOB_CONTAINER_CLIENT] = blob_container_client
     current_app.config[CONFIG_AUTH_CLIENT] = auth_helper
     current_app.config[CONFIG_AUTH_CLIENT_T1] = auth_helper_T1
     current_app.config[CONFIG_AUTH_CLIENT_T2] = auth_helper_T2
-    current_app.config[CONFIG_AUTH_CLIENT_T3] = auth_helper_T3
+    # current_app.config[CONFIG_AUTH_CLIENT_T3] = auth_helper_T3
 
     current_app.config[CONFIG_GPT4V_DEPLOYED] = bool(USE_GPT4V)
     current_app.config[CONFIG_SEMANTIC_RANKER_DEPLOYED] = AZURE_SEARCH_SEMANTIC_RANKER != "disabled"
@@ -574,66 +609,7 @@ async def setup_clients():
         query_language=AZURE_SEARCH_QUERY_LANGUAGE,
         query_speller=AZURE_SEARCH_QUERY_SPELLER,
     )
-    #cntrlk+cntrlc
-    # current_app.config[CONFIG_CHAT_APPROACH] = ChatReadRetrieveReadApproach(
-    #     search_client=search_client,
-    #     openai_client=openai_client,
-    #     auth_helper=auth_helper,
-    #     chatgpt_model=OPENAI_CHATGPT_MODEL,
-    #     chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
-    #     embedding_model=OPENAI_EMB_MODEL,
-    #     embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
-    #     embedding_dimensions=OPENAI_EMB_DIMENSIONS,
-    #     sourcepage_field=KB_FIELDS_SOURCEPAGE,
-    #     content_field=KB_FIELDS_CONTENT,
-    #     query_language=AZURE_SEARCH_QUERY_LANGUAGE,
-    #     query_speller=AZURE_SEARCH_QUERY_SPELLER,
-    # )
-   
-    current_app.config[CONFIG_CHAT_APPROACH_T1] = ChatReadRetrieveReadApproach(
-        search_client=search_client_T1,
-        openai_client=openai_client,
-        auth_helper=auth_helper_T1,
-        chatgpt_model=OPENAI_CHATGPT_MODEL,
-        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
-        embedding_model=OPENAI_EMB_MODEL,
-        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
-        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
-        sourcepage_field=KB_FIELDS_SOURCEPAGE,
-        content_field=KB_FIELDS_CONTENT,
-        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
-        query_speller=AZURE_SEARCH_QUERY_SPELLER,
-    )
-    current_app.config[CONFIG_CHAT_APPROACH_T2] = ChatReadRetrieveReadApproach(
-        search_client=search_client_T2,
-        openai_client=openai_client,
-        auth_helper=auth_helper_T2,
-        chatgpt_model=OPENAI_CHATGPT_MODEL,
-        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
-        embedding_model=OPENAI_EMB_MODEL,
-        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
-        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
-        sourcepage_field=KB_FIELDS_SOURCEPAGE,
-        content_field=KB_FIELDS_CONTENT,
-        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
-        query_speller=AZURE_SEARCH_QUERY_SPELLER,
-    )
-    current_app.config[CONFIG_CHAT_APPROACH_T3] = ChatReadRetrieveReadApproach(
-        search_client=search_client_T3,
-        openai_client=openai_client,
-        auth_helper=auth_helper_T3,
-        chatgpt_model=OPENAI_CHATGPT_MODEL,
-        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
-        embedding_model=OPENAI_EMB_MODEL,
-        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
-        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
-        sourcepage_field=KB_FIELDS_SOURCEPAGE,
-        content_field=KB_FIELDS_CONTENT,
-        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
-        query_speller=AZURE_SEARCH_QUERY_SPELLER,
-    )
     
-
     if USE_GPT4V:
         current_app.logger.info("USE_GPT4V is true, setting up GPT4V approach")
         if not AZURE_OPENAI_GPT4V_MODEL:
@@ -675,6 +651,62 @@ async def setup_clients():
             query_language=AZURE_SEARCH_QUERY_LANGUAGE,
             query_speller=AZURE_SEARCH_QUERY_SPELLER,
         )
+        
+    # current_app.config[CONFIG_CHAT_APPROACH] = ChatReadRetrieveReadApproach(
+    #     search_client=search_client,
+    #     openai_client=openai_client,
+    #     auth_helper=auth_helper,
+    #     chatgpt_model=OPENAI_CHATGPT_MODEL,
+    #     chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+    #     embedding_model=OPENAI_EMB_MODEL,
+    #     embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
+    #     sourcepage_field=KB_FIELDS_SOURCEPAGE,
+    #     content_field=KB_FIELDS_CONTENT,
+    #     query_language=AZURE_SEARCH_QUERY_LANGUAGE,
+    #     query_speller=AZURE_SEARCH_QUERY_SPELLER,
+    # )
+    current_app.config[CONFIG_CHAT_APPROACH_T1] = ChatReadRetrieveReadApproach(
+        search_client=search_client_T1,
+        openai_client=openai_client,
+        auth_helper=auth_helper_T1,
+        chatgpt_model=OPENAI_CHATGPT_MODEL,
+        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+        embedding_model=OPENAI_EMB_MODEL,
+        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
+        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
+        sourcepage_field=KB_FIELDS_SOURCEPAGE,
+        content_field=KB_FIELDS_CONTENT,
+        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
+        query_speller=AZURE_SEARCH_QUERY_SPELLER,
+    )
+    current_app.config[CONFIG_CHAT_APPROACH_T2] = ChatReadRetrieveReadApproach(
+        search_client=search_client_T2,
+        openai_client=openai_client,
+        auth_helper=auth_helper_T2,
+        chatgpt_model=OPENAI_CHATGPT_MODEL,
+        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+        embedding_model=OPENAI_EMB_MODEL,
+        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
+        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
+        sourcepage_field=KB_FIELDS_SOURCEPAGE,
+        content_field=KB_FIELDS_CONTENT,
+        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
+        query_speller=AZURE_SEARCH_QUERY_SPELLER,
+    )
+    # current_app.config[CONFIG_CHAT_APPROACH_T3] = ChatReadRetrieveReadApproach(
+    #     search_client=search_client_T3,
+    #     openai_client=openai_client,
+    #     auth_helper=auth_helper_T3,
+    #     chatgpt_model=OPENAI_CHATGPT_MODEL,
+    #     chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+    #     embedding_model=OPENAI_EMB_MODEL,
+    #     embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
+    #     embedding_dimensions=OPENAI_EMB_DIMENSIONS,
+    #     sourcepage_field=KB_FIELDS_SOURCEPAGE,
+    #     content_field=KB_FIELDS_CONTENT,
+    #     query_language=AZURE_SEARCH_QUERY_LANGUAGE,
+    #     query_speller=AZURE_SEARCH_QUERY_SPELLER,
+    # )
 
 
 @bp.after_app_serving
