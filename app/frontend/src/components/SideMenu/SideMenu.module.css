@@ -1,0 +1,54 @@
+.sideMenuContainer {
+  width: 250px;
+  min-width: 250px;
+  height: 100%;
+  background-color: #f3f3f3;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sideMenuHeader {
+  /* padding: 20px; */
+  padding: 10px;
+  background-color: #e7e7e7;
+  border-bottom: 1px solid #ddd;
+}
+
+.chatList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuOption {
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menuOption:hover {
+  background-color: #ddd;
+}
+
+.activeOption {
+  background-color: #ccc;
+}
+
+.caseDescription {
+  /* display: flex; */
+
+  word-wrap: break-word;
+  font-size: 14px;
+  text-align: center;
+  padding: 15px;
+}
+
+.disabledOption {
+  color: gray;
+  cursor: not-allowed;
+}

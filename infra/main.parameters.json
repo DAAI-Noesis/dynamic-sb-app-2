@@ -56,6 +56,9 @@
     "searchIndexName_T2": {
       "value": "${AZURE_SEARCH_INDEX_T2=index_t2}"
     },
+    "searchIndexName_T3": {
+      "value": "${AZURE_SEARCH_INDEX_T3=index_t3}"
+    },
     "searchServiceName": {
       "value": "${AZURE_SEARCH_SERVICE}"
     },

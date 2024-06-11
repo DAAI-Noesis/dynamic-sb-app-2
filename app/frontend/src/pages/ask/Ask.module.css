@@ -56,17 +56,11 @@
 }
 
 .askSettingsSeparator {
-    display: flex;
-    flex-direction: column;
     margin-top: 15px;
 }
 
-.commandsContainer {
-    display: flex;
+.settingsButton {
     align-self: flex-end;
-}
-
-.commandButton {
     margin-right: 20px;
     margin-top: 20px;
 }

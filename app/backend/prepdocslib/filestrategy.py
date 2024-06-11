@@ -118,8 +118,8 @@ class FileStrategy(Strategy):
                                 Section(split_page, content=file, category=self.category)
                                 for split_page in processor.splitter.split_pages(pages)
                             ]
-                            # index_name = search_info.index_name_list[2]
-                            index_name = search_info.index_name_list[1]
+                            index_name = search_info.index_name_list[2]
+                            # index_name = search_info.index_name_list[1]
                     
                     # sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
                     if sections:

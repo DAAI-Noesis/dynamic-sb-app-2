@@ -218,8 +218,8 @@ async def main(strategy: Strategy, setup_index: bool = True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Prepare documents by extracting content from PDFs, splitting content into sections, uploading to blob storage, and indexing in a search index.",
-        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 myindex -v",
-        epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 myindex -v",
+        epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 myindex -v",
+        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 myindex -v",
     )
     parser.add_argument("files", nargs="?", help="Files to be processed")
     parser.add_argument(
@@ -285,10 +285,10 @@ if __name__ == "__main__":
         "--index_t2",
         help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
     )
-    # parser.add_argument(
-    #     "--index_t3",
-    #     help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    # )
+    parser.add_argument(
+        "--index_t3",
+        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
+    )
     parser.add_argument(
         "--searchkey",
         required=False,
@@ -408,8 +408,8 @@ if __name__ == "__main__":
         setup_search_info(
             search_service=args.searchservice,
             #index_name=args.index,
-            # index_name_list = ["index_t1","index_t2","index_t3"],
-            index_name_list=["index_t1","index_t2"],
+            index_name_list = ["index_t1","index_t2","index_t3"],
+            # index_name_list=["index_t1","index_t2"],
             azure_credential=azd_credential,
             search_key=clean_key_if_exists(args.searchkey),
         )

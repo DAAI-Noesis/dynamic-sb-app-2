@@ -1,78 +1,80 @@
 .layout {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .header {
-    background-color: #222222;
-    color: #f2f2f2;
+  display: flex;
+  background-color: #222222;
+  color: #f2f2f2;
+  padding: 10px;
 }
 
 .headerContainer {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin-right: 12px;
-    margin-left: 12px;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .headerTitleContainer {
-    display: flex;
-    align-items: center;
-    margin-right: 40px;
-    color: #f2f2f2;
-    text-decoration: none;
+  display: flex;
+  align-items: center;
+  margin-right: 40px;
+  color: #f2f2f2;
+  text-decoration: none;
 }
 
 .headerLogo {
-    height: 40px;
+  height: auto;
 }
 
 .headerTitle {
-    margin-left: 12px;
-    font-weight: 600;
+  margin-left: 12px;
+  font-weight: 600;
 }
 
-.headerNavList {
-    display: flex;
-    list-style: none;
-    padding-left: 0;
+/* .logoButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+} */
+
+.logoButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0; /* Remove any padding */
+  display: flex;
+  justify-content: center; /* Center the logo within the button */
+  align-items: center; /* Center the logo within the button */
 }
 
-.headerNavPageLink {
-    color: #f2f2f2;
-    text-decoration: none;
-    opacity: 0.75;
-
-    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    transition-duration: 500ms;
-    transition-property: opacity;
+.logoButton:disabled {
+  cursor: not-allowed;
 }
 
-.headerNavPageLink:hover {
-    opacity: 1;
+/* .companyLogo {
+  width: 160px;
+  fill: white;
+} */
+
+.companyLogo {
+  width: 80px; /* Adjust the logo size as desired */
+  height: auto; /* Maintain aspect ratio */
 }
 
-.headerNavPageLinkActive {
-    color: #f2f2f2;
-    text-decoration: none;
+.bodyContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
-.headerNavLeftMargin {
-    margin-left: 20px;
-}
+.mainContent {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  background-color: white;
 
-.headerRightText {
-    font-weight: normal;
-    margin-left: 40px;
-}
-
-.microsoftLogo {
-    height: 23px;
-    font-weight: 600;
-}
-
-.githubLogo {
-    height: 20px;
+  overflow-y: hidden;
 }
