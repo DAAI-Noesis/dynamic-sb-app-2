@@ -10,11 +10,11 @@ type SideMenuProps = {
 
 const CASE_DESCRIPTION_TEXT = {
   THEME_1:
-    "THEME_1",
+    "Technical Assistance",
   THEME_2:
-    "THEME_2",
+    "Project Stock Outs",
   THEME_3:
-    "THEME_3"
+    "Project Phelps"
 } as const;
 
 export const SideMenu = ({
@@ -29,7 +29,7 @@ export const SideMenu = ({
     <aside className={styles.sideMenuContainer}>
       <div>
         <div className={styles.sideMenuHeader}>
-          <h2>Use Cases</h2>
+          <h2>Themes</h2>
         </div>
         <ul className={styles.chatList}>
           <li
@@ -40,7 +40,7 @@ export const SideMenu = ({
               isLoading ? null : onCaseSelect(USE_CASES.THEME_1)
             }
           >
-            THEME_1
+            Technical Assistance
           </li>
           <li
             className={`${styles.menuOption} ${
@@ -50,7 +50,7 @@ export const SideMenu = ({
               isLoading ? null : onCaseSelect(USE_CASES.THEME_2)
             }
           >
-            THEME_2
+            Project Stock Outs
           </li>
           <li
             className={`${styles.menuOption} ${
@@ -60,7 +60,7 @@ export const SideMenu = ({
               isLoading ? null : onCaseSelect(USE_CASES.THEME_3)
             }
           >
-            THEME_3
+            Project Phelps
           </li>
         </ul>
       </div>

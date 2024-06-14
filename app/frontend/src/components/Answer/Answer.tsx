@@ -80,7 +80,7 @@ export const Answer = ({
 
       {!!parsedAnswer.citations.length && (
         <Stack.Item>
-          <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+          <Stack horizontal wrap tokens={{ childrenGap: 5 }} verticalAlign="center">
             <span className={styles.citationLearnMore}>Citations:</span>
             {parsedAnswer.citations.map((x, i) => {
               const path = getCitationFilePath(x);
@@ -95,6 +95,19 @@ export const Answer = ({
                 </a>
               );
             })}
+            <IconButton
+              iconProps={{ iconName: "Like" }}
+              title="Like"
+              ariaLabel="Like"
+              onClick={() => alert('You liked the response!')}
+              styles={{ root: { marginLeft: 'auto' } }}
+            />
+            <IconButton
+              iconProps={{ iconName: "Dislike" }}
+              title="Dislike"
+              ariaLabel="Dislike"
+              onClick={() => alert('You disliked the response!')}
+            />
           </Stack>
         </Stack.Item>
       )}

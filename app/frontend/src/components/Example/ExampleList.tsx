@@ -5,19 +5,19 @@ import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES = {
   [USE_CASES.THEME_1]: [
-    "Do we have a CISO?",
-    "What are the steps we're taking on sustainability?",
-    "A PLMJ tem uma certificação ISO 27001?"
+    "Whats the main goal of AT",
+    "What about Market Tests?",
+    "What is the associated model and what is being done?"
   ],
   [USE_CASES.THEME_2]: [
-    "What are the 10 biggest transactions of 2022?",
-    "What is the Real Estate practice best known for?",
-    "Com que clientes trabalha o Diogo Duarte Campos?"
+    "What is the goal of Project Stock Outs?",
+    "How works the data processing?",
+    "Whats the KPIs of the project?"
   ],
   [USE_CASES.THEME_3]: [
-    "Do we have a CISO?",
-    "What are the steps we're taking on sustainability?",
-    "A PLMJ tem uma certificação ISO 27001?"
+    "What is the source, what data and what is it used for?",
+    "Where i can find the dashboard of Phelps?",
+    "What are the open Themes ? "
   ]
 };
 
