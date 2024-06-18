@@ -539,7 +539,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                   Chat with your data
                 </h1>
                 <h2 className={styles.chatEmptyStateSubtitle}>
-                  Ask anything or try an example
+                Ask anything or try an example
                 </h2>
                 <ExampleList
                   onExampleClicked={onExampleClicked}

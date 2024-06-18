@@ -38,12 +38,13 @@
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 30px;
+  font-family: Arial;
 }
 
 .chatEmptyStateSubtitle {
   font-weight: 600;
   margin-bottom: 10px;
-  font-family: Verdana, sans-serif;
+  font-family: Arial;
 }
 
 @media only screen and (max-height: 780px) {

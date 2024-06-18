@@ -5,9 +5,9 @@ import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES = {
   [USE_CASES.THEME_1]: [
-    "Whats the main goal of AT",
-    "What about Market Tests?",
-    "What is the associated model and what is being done?"
+    "Whats the main goal of AT?",
+    "What about Market Tests",
+    "What is the associated model and what is being done?",
   ],
   [USE_CASES.THEME_2]: [
     "What is the goal of Project Stock Outs?",
