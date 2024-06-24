@@ -5,19 +5,19 @@ import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES = {
   [USE_CASES.THEME_1]: [
-    "Whats the main goal of AT?",
-    "What about Market Tests",
-    "What is the associated model and what is being done?",
+    "Qual e o objetivo principal do AT?",
+    "Quais foram os objetivos do projeto piloto em 2024 ? ",
+    "Quais são os indicadores de performance do projeto ? ",
   ],
   [USE_CASES.THEME_2]: [
-    "What is the goal of Project Stock Outs?",
-    "How works the data processing?",
-    "Whats the KPIs of the project?"
+    "Qual é o objetivo do Projeto Stock Outs?",
+    "Como funciona o processamento dos dados?",
+    "Quais são os KPIs do porjeto?"
   ],
   [USE_CASES.THEME_3]: [
-    "What is the source, what data and what is it used for?",
-    "Where i can find the dashboard of Phelps?",
-    "What are the open Themes ? "
+    "No projeto Phelps , qual é a fonte , qual os dados e para que é que são usados",
+    "Onde posso encontrar o dashboard Phelps?",
+    "Quais são os temas abertos ? "
   ]
 };
 

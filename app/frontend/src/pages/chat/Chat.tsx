@@ -536,10 +536,10 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
                 <h1 className={styles.chatEmptyStateTitle}>
-                  Chat with your data
+                  Topicos Super Bock
                 </h1>
                 <h2 className={styles.chatEmptyStateSubtitle}>
-                Ask anything or try an example
+                Faz uma pergunta ou adiciona um exemplo
                 </h2>
                 <ExampleList
                   onExampleClicked={onExampleClicked}
