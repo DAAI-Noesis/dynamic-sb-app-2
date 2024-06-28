@@ -12,7 +12,7 @@ const DEFAULT_EXAMPLES = {
   [USE_CASES.THEME_2]: [
     "Qual é o objetivo do Projeto Stock Outs?",
     "Como funciona o processamento dos dados?",
-    "Quais são os KPIs do porjeto?"
+    "Quais são os KPIs do projeto?"
   ],
   [USE_CASES.THEME_3]: [
     "No projeto Phelps , qual é a fonte , qual os dados e para que é que são usados",

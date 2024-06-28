@@ -8,6 +8,7 @@ import {
   useImperativeHandle,
   forwardRef
 } from "react";
+import axios from 'axios';
 import {
   Checkbox,
   Panel,
@@ -72,6 +73,27 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     { activeUseCase, isLoading, hasUserScrolledUp, setIsLoading }: ChatProps,
     ref
   ) => {
+    const [userFeedback, setUserFeedback] = useState<boolean | null>(null);
+
+    // Function to handle feedback submission
+    const handleFeedback = async (feedback: boolean, question: string, botMessage: string) => {
+      setUserFeedback(feedback);
+
+      const data = {
+        UserQuestion: question,
+        BotMessage: botMessage,
+        UserFeedback: feedback,
+      };
+
+      const jsonData = JSON.stringify(data)
+
+      try {
+        const response = await axios.post("http://localhost:7071/api/Feedback_insert", jsonData);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error sending feedback:', error);
+      }
+    };
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [promptTemplate, setPromptTemplate] = useState<string>("");
     const [temperature, setTemperature] = useState<number>(0.2);
@@ -147,6 +169,8 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
         JSON.stringify(newAnswers)
       );
     };
+
+    
 
     const handleUseCaseRequest = async (
       request: ChatAppRequest,
@@ -619,6 +643,14 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                             answers.length - 1 === index
                           }
                         />
+                        <div>
+                          <button onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}>
+                            👍
+                          </button>
+                          <button onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}>
+                            👎
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -792,5 +824,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     );
   }
 );
+
+
 
 export default Chat;

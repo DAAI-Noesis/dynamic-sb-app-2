@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { Stack, IconButton, TextField, DefaultButton } from "@fluentui/react";
+import { Stack, IconButton } from "@fluentui/react";
 import DOMPurify from "dompurify";
 import axios from "axios";
 import { ChatAppResponse, getCitationFilePath } from "../../api";
 import { parseAnswerToHtml } from "./AnswerParser";
 
 import styles from "./Answer.module.css";
+import { QuestionInput } from "../QuestionInput";
 
 interface Props {
   answer: ChatAppResponse;
@@ -42,27 +43,6 @@ export const Answer = ({
   if (isStreaming && isLastAnswer) {
     sanitizedAnswerHtml += `<span class="${styles.loadingdots}" />`;
   }
-
-  const [userQuestion, setUserQuestion] = useState("");
-  const [liked, setLiked] = useState(false); // State to track like button click
-
-  const sendFeedback = async (feedback: boolean) => {
-    const feedbackData = {
-      BotMessage: messageContent,
-      UserFeedback: feedback,
-      UserQuestion: userQuestion // Include user question in feedback data
-    };
-
-    const jsonData = JSON.stringify(feedbackData);
-
-    try {
-      const response = await axios.post("http://localhost:7071/api/Feedback_insert", jsonData);
-      console.log("Feedback submitted:", response.data);
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-    }
-  };
-
   return (
     <Stack className={`${styles.answerContainer} ${isSelected ? styles.selected : ""}`} verticalAlign="space-between">
       <Stack.Item>
@@ -104,37 +84,7 @@ export const Answer = ({
                 </a>
               );
             })}
-            <IconButton
-              iconProps={{
-                iconName: "Like",
-                style: {
-                  color: liked ? 'blue' : 'black' // Change icon color to blue when liked
-                }
-              }}
-              title="Like"
-              ariaLabel="Like"
-              onClick={() => {
-                sendFeedback(true);
-                setLiked(true); // Update state to indicate button clicked
-              }}
-              styles={{
-                root: {
-                  marginLeft: 'auto',
-                  backgroundColor: 'transparent', // Ensure background is transparent or as needed
-                  selectors: {
-                    ':hover': {
-                      backgroundColor: 'transparent' // Optional: Handle hover styles if needed
-                    }
-                  }
-                }
-              }}
-            />
-            <IconButton
-              iconProps={{ iconName: "Dislike" }}
-              title="Dislike"
-              ariaLabel="Dislike"
-              onClick={() => sendFeedback(false)}
-            />
+
           </Stack>
         </Stack.Item>
       )}
@@ -151,6 +101,6 @@ export const Answer = ({
           </Stack>
         </Stack.Item>
       )}
-      </Stack>
+    </Stack>
   );
 };
