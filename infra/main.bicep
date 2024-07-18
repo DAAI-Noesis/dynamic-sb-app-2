@@ -175,7 +175,7 @@ param useVectors bool = false
 param useIntegratedVectorization bool = false
 
 @description('Enable user document upload feature')
-param useUserUpload bool = false
+param useUserUpload bool = true
 param useLocalPdfParser bool = false
 param useLocalHtmlParser bool = false
 

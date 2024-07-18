@@ -34,6 +34,7 @@ import {
   GPT4VInput,
   askApi
 } from "../../api";
+import { UploadFile } from "../../components/UploadFile";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -141,6 +142,9 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     const [showSemanticRankerOption, setShowSemanticRankerOption] =
       useState<boolean>(false);
     const [showVectorOption, setShowVectorOption] = useState<boolean>(false);
+    
+    const [showUserUpload, setShowUserUpload] = useState<boolean>(false);
+
     const [isAnalysisPanelExpanded, setIsAnalysisPanelExpanded] =
       useState<boolean>(false);
 
@@ -157,6 +161,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
         if (!config.showVectorOption) {
           setRetrievalMode(RetrievalMode.Text);
         }
+        setShowUserUpload(config.showUserUpload);
       });
     };
 
@@ -542,6 +547,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             onClick={clearChat}
             disabled={!lastQuestionRef.current || isLoading}
           />
+           {showUserUpload && <UploadFile className={styles.commandButton} disabled={!isLoggedIn(client)} />}
           <SettingsButton
             className={styles.commandButton}
             onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
