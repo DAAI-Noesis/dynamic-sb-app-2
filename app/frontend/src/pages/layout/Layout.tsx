@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useLogin } from "../../authConfig";
 import { LoginButton } from "../../components/LoginButton";
 import { SideMenu } from "../../components/SideMenu";
-import superbockLogo from "../../assets/superbockLogo.png";
+import superbockLogo from "../../assets/superbockLogo.jpg";
 import styles from "./Layout.module.css";
 import Chat, { ChatHandles } from "../chat/Chat";
 import { USE_CASES } from "../../helpers/constants";

@@ -12,17 +12,25 @@ body {
 html {
   background: #f2f2f2;
 
-  font-family: Arial;
+  font-family: Klavika;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
+h1 {
+  font-family: Klavika;
+}
+h2{
+  font-family: Klavika;
+}
+h3{
+  font-family: Klavika;
+}
+h4{
+  font-family: Klavika;
+}
 h5 {
-  font-family: Arial;
+  font-family: Klavika;
   font-weight: bold;
 }
 
