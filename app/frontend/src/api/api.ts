@@ -20,6 +20,7 @@ export function getHeaders(
   return headers;
 }
 
+
 export async function askApi(
   request: ChatAppRequest,
   idToken: string | undefined
@@ -92,6 +93,82 @@ export async function chat2Api(
       body: JSON.stringify(request)
   });
 }
+export async function chat3Api(
+  request: ChatAppRequest,
+  idToken: string | undefined
+): Promise<Response> {
+  return await fetch(`${BACKEND_URI}/chat3`, {
+      method: "POST",
+      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
+      body: JSON.stringify(request)
+  });
+}
+export async function chat4Api(
+  request: ChatAppRequest,
+  idToken: string | undefined
+): Promise<Response> {
+  return await fetch(`${BACKEND_URI}/chat4`, {
+      method: "POST",
+      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
+      body: JSON.stringify(request)
+  });
+}
+export async function chat5Api(
+  request: ChatAppRequest,
+  idToken: string | undefined
+): Promise<Response> {
+  return await fetch(`${BACKEND_URI}/chat5`, {
+      method: "POST",
+      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
+      body: JSON.stringify(request)
+  });
+}
+
+export async function listFoldersApi(idToken: string | undefined): Promise<string[]> {
+  try {
+    const response = await fetch(`${BACKEND_URI}/list_folders`, {
+      method: "GET",
+      headers: getHeaders(idToken)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching folders: ${response.statusText}`);
+    }
+
+    return await response.json() as string[];
+  } catch (error) {
+    console.error('Error in listFoldersApi:', error);
+    throw error;
+  }
+}
+
+// export async function listFoldersApi(idToken: string | undefined): Promise<string[]> {
+//   try {
+//     const response = await fetch(`${BACKEND_URI}/list_folders`, {
+//       method: "GET",
+//       headers: getHeaders(idToken)
+//     });
+
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       console.error(`Error fetching folders: ${response.statusText}. Response: ${errorText}`);
+//       throw new Error(`Error fetching folders: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+    
+//     if (!Array.isArray(data)) {
+//       console.error(`Unexpected response format: ${JSON.stringify(data)}`);
+//       throw new Error('Unexpected response format');
+//     }
+
+//     return data as string[];
+//   } catch (error) {
+//     console.error('Error in listFoldersApi:', error);
+//     throw error;
+//   }
+// }
+
 
 export function getCitationFilePath(citation: string): string {
   return `${BACKEND_URI}/content/${citation}`;

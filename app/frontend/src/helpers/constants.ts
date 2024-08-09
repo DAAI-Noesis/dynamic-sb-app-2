@@ -14,5 +14,9 @@ export enum TYPES_OF_CHAT_CONFIG {
 export enum USE_CASES {
   THEME_1 = "THEME_1",
   THEME_2 = "THEME_2",
-  THEME_3 = "THEME_3"
+  THEME_3 = "THEME_3",
+  THEME_4 = "THEME_4",
+  THEME_5 = "THEME_5",
+  THEME_6 = "THEME_6",
+
 }

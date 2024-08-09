@@ -23,9 +23,9 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
     const [uploadedFileError, setUploadedFileError] = useState<string>();
     const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
-    // if (!useLogin) {
-    //     throw new Error("The UploadFile component requires useLogin to be true");
-    // }
+    //  if (!useLogin) {
+    //      throw new Error("The UploadFile component requires useLogin to be true");
+    //  }
 
     const client = useMsal().instance;
 
@@ -94,7 +94,7 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
             setUploadedFileError(undefined);
             listUploadedFiles(idToken);
         } catch (error) {
-            console.error(error);
+            console.error("Upload error details:", error);
             setIsUploading(false);
             setUploadedFileError(`Error uploading file - please try again or contact admin.`);
         }
@@ -118,7 +118,7 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
                     >
                         <form encType="multipart/form-data">
                             <div>
-                                <Label>Upload file:</Label>
+                                <Label> Carregar ficheiro:</Label>
                                 <input
                                     accept=".txt, .md, .json, .png, .jpg, .jpeg, .bmp, .heic, .tiff, .pdf, .docx, .xlsx, .pptx, .html"
                                     className={styles.chooseFiles}
@@ -134,7 +134,7 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
                         {!isUploading && uploadedFile && <Text>{uploadedFile.message}</Text>}
 
                         {/* Display the list of already uploaded */}
-                        <h3>Previously uploaded files:</h3>
+                        <h3>Topicos já carregados:</h3>
 
                         {isLoading && <Text>Loading...</Text>}
                         {!isLoading && uploadedFiles.length === 0 && <Text>No files uploaded yet</Text>}

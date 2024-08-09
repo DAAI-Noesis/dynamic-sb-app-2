@@ -59,6 +59,18 @@
     "searchIndexName_T3": {
       "value": "${AZURE_SEARCH_INDEX_T3=index_t3}"
     },
+    "searchIndexName_T4": {
+      "value": "${AZURE_SEARCH_INDEX_T3=index_t4}"
+    },
+    "searchIndexName_T5": {
+      "value": "${AZURE_SEARCH_INDEX_T3=index_t5}"
+    },
+    "searchIndexName_T6": {
+      "value": "${AZURE_SEARCH_INDEX_T3=index_t6}"
+    },
+    "searchIndexName_T7": {
+      "value": "${AZURE_SEARCH_INDEX_T3=index_t7}"
+    },
     "searchServiceName": {
       "value": "${AZURE_SEARCH_SERVICE}"
     },

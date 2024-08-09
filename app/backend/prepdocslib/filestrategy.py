@@ -33,9 +33,289 @@ async def parse_file(
     return sections
 
 
+# class FileStrategy(Strategy):
+#     """
+#     Strategy for ingesting documents into a search service from files stored either locally or in a data lake storage account
+#     """
+
+#     def __init__(
+#         self,
+#         list_file_strategy: ListFileStrategy,
+#         blob_manager: BlobManager,
+#         search_info: SearchInfo,
+#         file_processors: dict[str, FileProcessor],
+#         document_action: DocumentAction = DocumentAction.Add,
+#         embeddings: Optional[OpenAIEmbeddings] = None,
+#         image_embeddings: Optional[ImageEmbeddings] = None,
+#         search_analyzer_name: Optional[str] = None,
+#         use_acls: bool = False,
+#         category: Optional[str] = None,
+#     ):
+#         self.list_file_strategy = list_file_strategy
+#         self.blob_manager = blob_manager
+#         self.file_processors = file_processors
+#         self.document_action = document_action
+#         self.embeddings = embeddings
+#         self.image_embeddings = image_embeddings
+#         self.search_analyzer_name = search_analyzer_name
+#         self.search_info = search_info
+#         self.use_acls = use_acls
+#         self.category = category
+
+#     async def setup(self, search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info,
+#             self.search_analyzer_name,
+#             self.use_acls,
+#             False,
+#             self.embeddings,
+#             search_images=self.image_embeddings is not None,
+#         )
+#         await search_manager.create_index()
+
+#     async def run(self, search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
+#         )
+#         if self.document_action == DocumentAction.Add:
+#             files = self.list_file_strategy.list()
+#             async for file in files:
+#                 try:
+#                     key = file.file_extension()
+#                     processor = self.file_processors.get(key)
+#                     # if processor is None:
+#                     if processor is None:
+#                         print(f"Skipping '{file.filename()}'.")
+#                         continue
+                    
+#                     print(f"Parsing '{file.filename()}'")
+                    
+                    
+#                     if "AT" in file.content.name:
+#                         pages = [page async for page in processor.parser.parse(content=file.content)]
+                        
+#                         print(f"Splitting '{file.filename()}' into sections")
+#                         sections = [
+#                             Section(split_page, content=file, category=self.category)
+#                             for split_page in processor.splitter.split_pages(pages)
+#                         ]
+#                         index_name = search_info.index_name_list[0]
+#                     else: 
+#                         if "OSA" in file.content.name:
+#                             pages = [page async for page in processor.parser.parse(content=file.content)]
+                        
+#                             print(f"Splitting '{file.filename()}' into sections")
+#                             sections = [
+#                                 Section(split_page, content=file, category=self.category)
+#                                 for split_page in processor.splitter.split_pages(pages)
+#                             ]
+#                             index_name = search_info.index_name_list[1]
+#                         else:
+#                             pages = [page async for page in processor.parser.parse(content=file.content)]
+                            
+#                             print(f"Splitting '{file.filename()}' into sections")
+#                             sections = [
+#                                 Section(split_page, content=file, category=self.category)
+#                                 for split_page in processor.splitter.split_pages(pages)
+#                             ]
+#                             index_name = search_info.index_name_list[2]
+#                             # index_name = search_info.index_name_list[1]
+                    
+#                     # sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
+#                     if sections:
+#                         blob_sas_uris = await self.blob_manager.upload_blob(file)
+#                         blob_image_embeddings: Optional[List[List[float]]] = None
+#                         if self.image_embeddings and blob_sas_uris:
+#                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
+#                         await search_manager.update_content(index_name, sections, blob_image_embeddings, url=file.url)
+#                 finally:
+#                     if file:
+#                         file.close()
+#         elif self.document_action == DocumentAction.Remove:
+#             paths = self.list_file_strategy.list_paths()
+#             async for path in paths:
+#                 await self.blob_manager.remove_blob(path)
+#                 await search_manager.remove_content(path)
+#         elif self.document_action == DocumentAction.RemoveAll:
+#             await self.blob_manager.remove_blob()
+#             await search_manager.remove_content()
+# class FileStrategy(Strategy):
+#     """
+#     Strategy for ingesting documents into a search service from files stored either locally or in a data lake storage account
+#     """
+
+#     def __init__(
+#         self,
+#         list_file_strategy: ListFileStrategy,
+#         blob_manager: BlobManager,
+#         search_info: SearchInfo,
+#         file_processors: dict[str, FileProcessor],
+#         document_action: DocumentAction = DocumentAction.Add,
+#         embeddings: Optional[OpenAIEmbeddings] = None,
+#         image_embeddings: Optional[ImageEmbeddings] = None,
+#         search_analyzer_name: Optional[str] = None,
+#         use_acls: bool = False,
+#         category: Optional[str] = None,
+#     ):
+#         self.list_file_strategy = list_file_strategy
+#         self.blob_manager = blob_manager
+#         self.file_processors = file_processors
+#         self.document_action = document_action
+#         self.embeddings = embeddings
+#         self.image_embeddings = image_embeddings
+#         self.search_analyzer_name = search_analyzer_name
+#         self.search_info = search_info
+#         self.use_acls = use_acls
+#         self.category = category
+
+#     async def setup(self,search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info,
+#             self.search_analyzer_name,
+#             self.use_acls,
+#             False,
+#             self.embeddings,
+#             search_images=self.image_embeddings is not None,
+#         )
+#         await search_manager.create_index()
+
+#     async def run(self, search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
+#         )
+#         if self.document_action == DocumentAction.Add:
+#             files = self.list_file_strategy.list()
+#             async for file in files:
+#                 try:
+#                     key = file.file_extension()
+#                     processor = self.file_processors.get(key)
+#                     # if processor is None:
+#                     if processor is None:
+#                         print(f"Skipping '{file.filename()}'.")
+#                         continue
+                    
+#                     print(f"Parsing '{file.filename()}'")
+
+
+
+
+
+
+
+#                     sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
+#                     if sections:
+#                         blob_sas_uris = await self.blob_manager.upload_blob(file)
+#                         blob_image_embeddings: Optional[List[List[float]]] = None
+#                         if self.image_embeddings and blob_sas_uris:
+#                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
+#                         await search_manager.update_content(sections, blob_image_embeddings, url=file.url)
+#                 finally:
+#                     if file:
+#                         file.close()
+#         elif self.document_action == DocumentAction.Remove:
+#             paths = self.list_file_strategy.list_paths()
+#             async for path in paths:
+#                 await self.blob_manager.remove_blob(path)
+#                 await search_manager.remove_content(path)
+#         elif self.document_action == DocumentAction.RemoveAll:
+#             await self.blob_manager.remove_blob()
+#             await search_manager.remove_content()
+# Working version of one index for each file ->
+# class FileStrategy(Strategy):
+#     """
+#     Strategy for ingesting documents into a search service from files stored either locally or in a data lake storage account
+#     """
+
+#     def __init__(
+#         self,
+#         list_file_strategy: ListFileStrategy,
+#         blob_manager: BlobManager,
+#         search_info: SearchInfo,
+#         file_processors: dict[str, FileProcessor],
+#         document_action: DocumentAction = DocumentAction.Add,
+#         embeddings: Optional[OpenAIEmbeddings] = None,
+#         image_embeddings: Optional[ImageEmbeddings] = None,
+#         search_analyzer_name: Optional[str] = None,
+#         use_acls: bool = False,
+#         category: Optional[str] = None,
+#     ):
+#         self.list_file_strategy = list_file_strategy
+#         self.blob_manager = blob_manager
+#         self.file_processors = file_processors
+#         self.document_action = document_action
+#         self.embeddings = embeddings
+#         self.image_embeddings = image_embeddings
+#         self.search_analyzer_name = search_analyzer_name
+#         self.search_info = search_info
+#         self.use_acls = use_acls
+#         self.category = category
+
+#     async def setup(self, search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info,
+#             self.search_analyzer_name,
+#             self.use_acls,
+#             False,
+#             self.embeddings,
+#             search_images=self.image_embeddings is not None,
+#         )
+#         await search_manager.create_index()
+
+#     async def run(self, search_info: SearchInfo):
+#         search_manager = SearchManager(
+#             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
+#         )
+        
+#         if self.document_action == DocumentAction.Add:
+#             files = self.list_file_strategy.list()
+#             index_name_list = search_info.index_name_list
+#             index_count = len(index_name_list)
+#             file_counter = 0  # To track the position of the file
+            
+#             async for file in files:
+#                 try:
+#                     key = file.file_extension()
+#                     processor = self.file_processors.get(key)
+#                     if processor is None:
+#                         print(f"Skipping '{file.filename()}'.")
+#                         continue
+                    
+#                     print(f"Parsing '{file.filename()}'")
+                    
+#                     pages = [page async for page in processor.parser.parse(content=file.content)]
+#                     print(f"Splitting '{file.filename()}' into sections")
+#                     sections = [
+#                         Section(split_page, content=file, category=self.category)
+#                         for split_page in processor.splitter.split_pages(pages)
+#                     ]
+
+#                     # Determine the index name based on the file counter
+#                     index_position = file_counter % index_count
+#                     index_name = index_name_list[index_position]
+
+#                     if sections:
+#                         blob_sas_uris = await self.blob_manager.upload_blob(file)
+#                         blob_image_embeddings: Optional[List[List[float]]] = None
+#                         if self.image_embeddings and blob_sas_uris:
+#                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
+#                         await search_manager.update_content(index_name, sections, blob_image_embeddings, url=file.url)
+                    
+#                     file_counter += 1  # Increment the counter for the next file
+                
+#                 finally:
+#                     if file:
+#                         file.close()
+#         elif self.document_action == DocumentAction.Remove:
+#             paths = self.list_file_strategy.list_paths()
+#             async for path in paths:
+#                 await self.blob_manager.remove_blob(path)
+#                 await search_manager.remove_content(path)
+#         elif self.document_action == DocumentAction.RemoveAll:
+#             await self.blob_manager.remove_blob()
+#             await search_manager.remove_content()
 class FileStrategy(Strategy):
     """
-    Strategy for ingesting documents into a search service from files stored either locally or in a data lake storage account
+    Strategy for ingesting documents into a search service from files stored either locally or in a data lake storage account.
     """
 
     def __init__(
@@ -77,60 +357,55 @@ class FileStrategy(Strategy):
         search_manager = SearchManager(
             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
         )
+        
         if self.document_action == DocumentAction.Add:
             files = self.list_file_strategy.list()
+            index_name_list = search_info.index_name_list
+            index_count = len(index_name_list)
+
+            folder_to_index = {}  # Maps folder paths to index names
+            index_counter = 0
+
             async for file in files:
                 try:
                     key = file.file_extension()
                     processor = self.file_processors.get(key)
-                    # if processor is None:
                     if processor is None:
                         print(f"Skipping '{file.filename()}'.")
                         continue
                     
+                    folder_path = file.extract_folder_path()
+                    
+                    # If folder is not yet assigned, assign the next available index
+                    if folder_path not in folder_to_index:
+                        index_name = index_name_list[index_counter % index_count]
+                        folder_to_index[folder_path] = index_name
+                        index_counter += 1  # Move to the next index
+
+                    index_name = folder_to_index[folder_path]
+                    
+                    print(f"Processing files in folder '{folder_path}' with index '{index_name}'")
+
                     print(f"Parsing '{file.filename()}'")
                     
-                    
-                    if "AT" in file.content.name:
-                        pages = [page async for page in processor.parser.parse(content=file.content)]
-                        
-                        print(f"Splitting '{file.filename()}' into sections")
-                        sections = [
-                            Section(split_page, content=file, category=self.category)
-                            for split_page in processor.splitter.split_pages(pages)
-                        ]
-                        index_name = search_info.index_name_list[0]
-                    else: 
-                        if "OSA" in file.content.name:
-                            pages = [page async for page in processor.parser.parse(content=file.content)]
-                        
-                            print(f"Splitting '{file.filename()}' into sections")
-                            sections = [
-                                Section(split_page, content=file, category=self.category)
-                                for split_page in processor.splitter.split_pages(pages)
-                            ]
-                            index_name = search_info.index_name_list[1]
-                        else:
-                            pages = [page async for page in processor.parser.parse(content=file.content)]
-                            
-                            print(f"Splitting '{file.filename()}' into sections")
-                            sections = [
-                                Section(split_page, content=file, category=self.category)
-                                for split_page in processor.splitter.split_pages(pages)
-                            ]
-                            index_name = search_info.index_name_list[2]
-                            # index_name = search_info.index_name_list[1]
-                    
-                    # sections = await parse_file(file, self.file_processors, self.category, self.image_embeddings)
+                    pages = [page async for page in processor.parser.parse(content=file.content)]
+                    print(f"Splitting '{file.filename()}' into sections")
+                    sections = [
+                        Section(split_page, content=file, category=self.category)
+                        for split_page in processor.splitter.split_pages(pages)
+                    ]
+
                     if sections:
                         blob_sas_uris = await self.blob_manager.upload_blob(file)
                         blob_image_embeddings: Optional[List[List[float]]] = None
                         if self.image_embeddings and blob_sas_uris:
                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
                         await search_manager.update_content(index_name, sections, blob_image_embeddings, url=file.url)
+                
                 finally:
                     if file:
                         file.close()
+
         elif self.document_action == DocumentAction.Remove:
             paths = self.list_file_strategy.list_paths()
             async for path in paths:
@@ -139,6 +414,18 @@ class FileStrategy(Strategy):
         elif self.document_action == DocumentAction.RemoveAll:
             await self.blob_manager.remove_blob()
             await search_manager.remove_content()
+     
+    
+    async def get_folder_names(self):
+        files = self.list_file_strategy.list()
+        folder_names = set()
+
+        async for file in files:
+            folder_path = file.extract_folder_path()
+            folder_names.add(folder_path)
+        
+        return list(folder_names)       
+    
 
 
 class UploadUserFileStrategy:

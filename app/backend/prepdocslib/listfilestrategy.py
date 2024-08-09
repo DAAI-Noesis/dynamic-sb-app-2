@@ -7,7 +7,7 @@ import tempfile
 from abc import ABC
 from glob import glob
 from typing import IO, AsyncGenerator, Dict, List, Optional, Union
-
+import urllib.parse
 from azure.core.credentials_async import AsyncTokenCredential
 from azure.storage.filedatalake.aio import (
     DataLakeServiceClient,
@@ -44,7 +44,20 @@ class File:
     def close(self):
         if self.content:
             self.content.close()
-
+    def extract_folder_path(self):
+        """
+        Extracts the folder path from the URL of the file.
+        """
+        if self.url:
+            parsed_url = urllib.parse.urlparse(self.url)
+            parsed_path = urllib.parse.unquote(parsed_url.path)
+            content_index = parsed_path.find('/content/')
+            if content_index != -1:
+                folder_path = os.path.dirname(parsed_path[content_index + len('/content/'):])
+                print(f"Extracted folder path: '{folder_path}' from URL: '{self.url}'")
+                return folder_path
+        print("URL not provided or incorrect; returning empty folder path.")
+        return ''
 
 class ListFileStrategy(ABC):
     """
@@ -111,6 +124,73 @@ class LocalListFileStrategy(ListFileStrategy):
         return False
 
 
+# class ADLSGen2ListFileStrategy(ListFileStrategy):
+#     """
+#     Concrete strategy for listing files that are located in a data lake storage account
+#     """
+
+#     def __init__(
+#         self,
+#         data_lake_storage_account: str,
+#         data_lake_filesystem: str,
+#         data_lake_path: str,
+#         credential: Union[AsyncTokenCredential, str],
+#     ):
+#         self.data_lake_storage_account = data_lake_storage_account
+#         self.data_lake_filesystem = data_lake_filesystem
+#         self.data_lake_path = data_lake_path
+#         self.credential = credential
+
+#     async def list_paths(self) -> AsyncGenerator[str, None]:
+#         async with DataLakeServiceClient(
+#             account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+#         ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+#             print(self.data_lake_path)
+#             async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+#                 if path.is_directory:
+#                     continue
+
+#                 yield path.name
+
+#     async def list(self) -> AsyncGenerator[File, None]:
+#         async with DataLakeServiceClient(
+#             account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+#         ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+#             async for path in self.list_paths():
+#                 temp_file_path = os.path.join(tempfile.gettempdir(), os.path.basename(path))
+#                 try:
+#                     async with filesystem_client.get_file_client(path) as file_client:
+#                         with open(temp_file_path, "wb") as temp_file:
+#                             downloader = await file_client.download_file()
+#                             await downloader.readinto(temp_file)
+#                     # Parse out user ids and group ids
+#                     acls: Dict[str, List[str]] = {"oids": [], "groups": []}
+#                     # https://learn.microsoft.com/python/api/azure-storage-file-datalake/azure.storage.filedatalake.datalakefileclient?view=azure-python#azure-storage-filedatalake-datalakefileclient-get-access-control
+#                     # Request ACLs as GUIDs
+#                     access_control = await file_client.get_access_control(upn=False)
+#                     acl_list = access_control["acl"]
+#                     # https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-access-control
+#                     # ACL Format: user::rwx,group::r-x,other::r--,user:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:r--
+#                     acl_list = acl_list.split(",")
+#                     for acl in acl_list:
+#                         acl_parts: list = acl.split(":")
+#                         if len(acl_parts) != 3:
+#                             continue
+#                         if len(acl_parts[1]) == 0:
+#                             continue
+#                         if acl_parts[0] == "user" and "r" in acl_parts[2]:
+#                             acls["oids"].append(acl_parts[1])
+#                         if acl_parts[0] == "group" and "r" in acl_parts[2]:
+#                             acls["groups"].append(acl_parts[1])
+#                     yield File(content=open(temp_file_path, "rb"), acls=acls, url=file_client.url)
+#                 except Exception as data_lake_exception:
+#                     logger.error(f"\tGot an error while reading {path} -> {data_lake_exception} --> skipping file")
+#                     try:
+#                         os.remove(temp_file_path)
+#                     except Exception as file_delete_exception:
+#                         logger.error(f"\tGot an error while deleting {temp_file_path} -> {file_delete_exception}")
+
+
 class ADLSGen2ListFileStrategy(ListFileStrategy):
     """
     Concrete strategy for listing files that are located in a data lake storage account
@@ -132,11 +212,40 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
         async with DataLakeServiceClient(
             account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
         ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+            print(f"Listing paths in filesystem '{self.data_lake_filesystem}' at path '{self.data_lake_path}'")
             async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
                 if path.is_directory:
                     continue
 
+                print(f"Found file path: {path.name}")
                 yield path.name
+    
+    # async def list_folders(self) -> List[str]:
+    #     folder_names = set()
+    #     async with DataLakeServiceClient(
+    #         account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+    #     ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+    #         async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+    #             if path.is_directory:
+    #                 folder_names.add(path.name)
+    #             else:
+    #                 folder_path = os.path.dirname(path.name)
+    #                 folder_names.add(folder_path)
+    #     return sorted(folder_names)
+    async def list_folders(self) -> List[str]:
+        folder_names = set()
+        async with DataLakeServiceClient(
+            account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+        ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+            async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+                if path.is_directory:
+                    folder_names.add(path.name.split('/')[0])  # Adiciona apenas o nome da pasta raiz
+                else:
+                    folder_path = path.name.split('/')[0]  # Adiciona apenas o nome da pasta raiz
+                    folder_names.add(folder_path)
+                    print(folder_names)
+        return sorted(folder_names)
+    
 
     async def list(self) -> AsyncGenerator[File, None]:
         async with DataLakeServiceClient(
@@ -151,12 +260,8 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
                             await downloader.readinto(temp_file)
                     # Parse out user ids and group ids
                     acls: Dict[str, List[str]] = {"oids": [], "groups": []}
-                    # https://learn.microsoft.com/python/api/azure-storage-file-datalake/azure.storage.filedatalake.datalakefileclient?view=azure-python#azure-storage-filedatalake-datalakefileclient-get-access-control
-                    # Request ACLs as GUIDs
                     access_control = await file_client.get_access_control(upn=False)
                     acl_list = access_control["acl"]
-                    # https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-access-control
-                    # ACL Format: user::rwx,group::r-x,other::r--,user:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:r--
                     acl_list = acl_list.split(",")
                     for acl in acl_list:
                         acl_parts: list = acl.split(":")
@@ -170,8 +275,8 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
                             acls["groups"].append(acl_parts[1])
                     yield File(content=open(temp_file_path, "rb"), acls=acls, url=file_client.url)
                 except Exception as data_lake_exception:
-                    logger.error(f"\tGot an error while reading {path} -> {data_lake_exception} --> skipping file")
+                    logger.error(f"Got an error while reading {path} -> {data_lake_exception} --> skipping file")
                     try:
                         os.remove(temp_file_path)
                     except Exception as file_delete_exception:
-                        logger.error(f"\tGot an error while deleting {temp_file_path} -> {file_delete_exception}")
+                        logger.error(f"Got an error while deleting {temp_file_path} -> {file_delete_exception}")

@@ -24,6 +24,9 @@ import styles from "./Chat.module.css";
 import {
   chatApi,
   chat2Api,
+  chat3Api,
+  chat4Api,
+  chat5Api,
   configApi,
   RetrievalMode,
   ChatAppResponse,
@@ -59,10 +62,10 @@ import { TYPES_OF_CHAT_CONFIG, USE_CASES } from "../../helpers/constants";
 import PrintButton from "../../components/PrintButton/PrintButton";
 
 type ChatProps = {
-  activeUseCase: USE_CASES;
+  activeUseCase: USE_CASES; // Change from USE_CASES to string
   isLoading: boolean;
   hasUserScrolledUp: boolean;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setIsLoading: (loading: boolean) => void;
 };
 
 export interface ChatHandles {
@@ -75,6 +78,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     ref
   ) => {
     const [userFeedback, setUserFeedback] = useState<boolean | null>(null);
+    
 
     // Function to handle feedback submission
     const handleFeedback = async (feedback: boolean, question: string, botMessage: string) => {
@@ -120,7 +124,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       GPT4VInput.TextAndImages
     );
     const [useGPT4V, setUseGPT4V] = useState<boolean>(false);
-
+    
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -187,6 +191,12 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
         return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_3)
         return await chat2Api(request, token);
+      if (activeUseCase === USE_CASES.THEME_4)
+        return await chat3Api(request, token);
+      if (activeUseCase === USE_CASES.THEME_5)
+        return await chat4Api(request, token);
+      if (activeUseCase === USE_CASES.THEME_6)
+        return await chat5Api(request, token);
 
       throw new Error(`Unhandled use case: ${activeUseCase}`);
     };
@@ -266,7 +276,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     };
 
     const client = useLogin ? useMsal().instance : undefined;
-
+    
     const makeApiRequest = async (question: string) => {
       lastQuestionRef.current = question;
 
@@ -566,7 +576,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
                 <h1 className={styles.chatEmptyStateTitle}>
-                  Topicos Super Bock
+                  Tópicos Super Bock
                 </h1>
                 <h2 className={styles.chatEmptyStateSubtitle}>
                 Faz uma pergunta ou adiciona um exemplo

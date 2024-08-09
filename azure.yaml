@@ -4,7 +4,7 @@ name: azure-search-openai-demo
 metadata:
   template: azure-search-openai-demo@0.0.2-beta
 services:
-  backend:
+  backend11:
     project: ./app/backend
     language: py
     host: appservice
@@ -33,6 +33,10 @@ pipeline:
       - AZURE_SEARCH_INDEX_T1
       - AZURE_SEARCH_INDEX_T2
       - AZURE_SEARCH_INDEX_T3
+      - AZURE_SEARCH_INDEX_T4
+      - AZURE_SEARCH_INDEX_T5
+      - AZURE_SEARCH_INDEX_T6
+      - AZURE_SEARCH_INDEX_T7
       - AZURE_SEARCH_SERVICE
       - AZURE_SEARCH_SERVICE_RESOURCE_GROUP
       - AZURE_SEARCH_SERVICE_LOCATION

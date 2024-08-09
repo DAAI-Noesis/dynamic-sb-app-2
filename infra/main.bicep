@@ -27,6 +27,10 @@ param searchIndexName string // Set in main.parameters.json
 param searchIndexName_T1 string // Set in main.parameters.json
 param searchIndexName_T2 string // Set in main.parameters.json
 param searchIndexName_T3 string // Set in main.parameters.json
+param searchIndexName_T4 string // Set in main.parameters.json
+param searchIndexName_T5 string // Set in main.parameters.json
+param searchIndexName_T6 string // Set in main.parameters.json
+param searchIndexName_T7 string // Set in main.parameters.json
 param searchQueryLanguage string // Set in main.parameters.json
 param searchQuerySpeller string // Set in main.parameters.json
 param searchServiceSemanticRankerLevel string // Set in main.parameters.json
@@ -266,7 +270,7 @@ module backend 'core/host/appservice.bicep' = {
   params: {
     name: !empty(backendServiceName) ? backendServiceName : '${abbrs.webSitesAppService}backend-${resourceToken}'
     location: location
-    tags: union(tags, { 'azd-service-name': 'backend' })
+    tags: union(tags, { 'azd-service-name': 'backend11' })
     appServicePlanId: appServicePlan.outputs.id
     runtimeName: 'python'
     runtimeVersion: '3.11'
@@ -290,6 +294,10 @@ module backend 'core/host/appservice.bicep' = {
       AZURE_SEARCH_INDEX_T1: searchIndexName_T1
       AZURE_SEARCH_INDEX_T2: searchIndexName_T2
       AZURE_SEARCH_INDEX_T3: searchIndexName_T3
+      AZURE_SEARCH_INDEX_T4: searchIndexName_T4
+      AZURE_SEARCH_INDEX_T5: searchIndexName_T5
+      AZURE_SEARCH_INDEX_T6: searchIndexName_T6
+      AZURE_SEARCH_INDEX_T7: searchIndexName_T7
       AZURE_SEARCH_SERVICE: searchService.outputs.name
       AZURE_SEARCH_SEMANTIC_RANKER: actualSearchServiceSemanticRankerLevel
       AZURE_VISION_ENDPOINT: useGPT4V ? computerVision.outputs.endpoint : ''
@@ -797,6 +805,10 @@ output AZURE_SEARCH_INDEX string = searchIndexName
 output AZURE_SEARCH_INDEX_T1 string = searchIndexName_T1
 output AZURE_SEARCH_INDEX_T2 string = searchIndexName_T2
 output AZURE_SEARCH_INDEX_T3 string = searchIndexName_T3
+output AZURE_SEARCH_INDEX_T4 string = searchIndexName_T4
+output AZURE_SEARCH_INDEX_T5 string = searchIndexName_T5
+output AZURE_SEARCH_INDEX_T6 string = searchIndexName_T6
+output AZURE_SEARCH_INDEX_T7 string = searchIndexName_T7
 output AZURE_SEARCH_SERVICE string = searchService.outputs.name
 output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
 output AZURE_SEARCH_SEMANTIC_RANKER string = actualSearchServiceSemanticRankerLevel
