@@ -1318,7 +1318,7 @@ def create_app():
     data_lake_filesystem = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM')
     data_lake_path = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM_PATH')
 
-   
+   #changes
     credential = DefaultAzureCredential()  # Adjust based on your setup
 
     list_file_strategy = ADLSGen2ListFileStrategy(
