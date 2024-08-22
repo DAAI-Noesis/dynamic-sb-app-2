@@ -495,7 +495,7 @@ export const SideMenu = ({
     }
   }, [getUseCaseKeyFromIndex, isLoading, onCaseSelect]);
 
-  const debouncedHandleClick = useMemo(() => debounce((index: number) => handleClick(index), 300), [handleClick]);
+  const debouncedHandleClick = useMemo(() => debounce((index: number) => handleClick(index), 0), [handleClick]);
 
   return (
     <aside className={styles.sideMenuContainer}>

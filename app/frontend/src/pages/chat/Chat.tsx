@@ -576,7 +576,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
                 <h1 className={styles.chatEmptyStateTitle}>
-                  Tópicos Super Bock
+                  Tópicos Super Bock AHhhH
                 </h1>
                 <h2 className={styles.chatEmptyStateSubtitle}>
                 Faz uma pergunta ou adiciona um exemplo

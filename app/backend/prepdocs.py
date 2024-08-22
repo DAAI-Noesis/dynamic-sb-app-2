@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import logging
 from typing import Optional, Union, List
-
+from config import CONFIG_LIST_FILE_STRATEGY
 from azure.core.credentials import AzureKeyCredential
 from azure.core.credentials_async import AsyncTokenCredential
 from azure.identity.aio import AzureDeveloperCliCredential, get_bearer_token_provider

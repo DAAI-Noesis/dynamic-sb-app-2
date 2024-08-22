@@ -128,7 +128,7 @@ export async function listFoldersApi(idToken: string | undefined): Promise<strin
   try {
     const response = await fetch(`${BACKEND_URI}/list_folders`, {
       method: "GET",
-      headers: getHeaders(idToken)
+      headers:  { ...getHeaders(idToken), "Content-Type": "application/json" },
     });
 
     if (!response.ok) {

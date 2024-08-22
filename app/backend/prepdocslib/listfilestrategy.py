@@ -12,6 +12,7 @@ from azure.core.credentials_async import AsyncTokenCredential
 from azure.storage.filedatalake.aio import (
     DataLakeServiceClient,
 )
+from quart import current_app
 
 logger = logging.getLogger("ingester")
 
@@ -232,19 +233,49 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
     #                 folder_path = os.path.dirname(path.name)
     #                 folder_names.add(folder_path)
     #     return sorted(folder_names)
+    # async def list_folders(self) -> List[str]:
+    #     folder_names = set()
+    #     async with DataLakeServiceClient(
+    #         account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+    #     ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+    #         async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+    #             if path.is_directory:
+    #                 folder_names.add(path.name.split('/')[0])  # Adiciona apenas o nome da pasta raiz
+    #             else:
+    #                 folder_path = path.name.split('/')[0]  # Adiciona apenas o nome da pasta raiz
+    #                 folder_names.add(folder_path)
+    #                 print(folder_names)
+    #     return sorted(folder_names)
+
     async def list_folders(self) -> List[str]:
-        folder_names = set()
-        async with DataLakeServiceClient(
-            account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+       folder_names = set()
+       try:
+         current_app.logger.info("Starting to list folders")
+         async with DataLakeServiceClient(
+            account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", 
+            credential=self.credential
         ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+            
             async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+                current_app.logger.info(f"Processing path: {path.name}")
+
                 if path.is_directory:
-                    folder_names.add(path.name.split('/')[0])  # Adiciona apenas o nome da pasta raiz
+                    folder_names.add(path.name.split('/')[0])  # Add root folder name only
                 else:
-                    folder_path = path.name.split('/')[0]  # Adiciona apenas o nome da pasta raiz
+                    folder_path = path.name.split('/')[0]  # Add root folder name only
                     folder_names.add(folder_path)
-                    print(folder_names)
-        return sorted(folder_names)
+
+                current_app.logger.info(f"Current folder names set: {folder_names}")
+
+         current_app.logger.info(f"Successfully listed folders: {folder_names}")
+         return sorted(folder_names)
+
+       except ValueError as ve:
+           current_app.logger.error(f"ValueError in list_folders: {ve}")
+           raise
+       except Exception as e:
+           current_app.logger.error(f"Unexpected error in list_folders: {e}")
+           raise
     
 
     async def list(self) -> AsyncGenerator[File, None]:

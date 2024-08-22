@@ -39,4 +39,10 @@ CONFIG_SEARCH_CLIENT_T7 = "search_client_T7"
 CONFIG_OPENAI_CLIENT = "openai_client"
 CONFIG_INGESTER = "ingester"
 CONFIG_LIST_FILE_STRATEGY = "list_file_strategy"
+CONFIG_DATA_LAKE_STORAGE_ACCOUNT = "data_lake_storage_account"
+CONFIG_DATA_LAKE_FILESYSTEM = "data_lake_filesystem"
+CONFIG_DATA_LAKE_PATH = "data_lake_path"
+CONFIG_AZURE_CREDENTIAL = "azure_credential"  
+
+
 

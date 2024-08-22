@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Union, cast
 from prepdocslib.listfilestrategy import ADLSGen2ListFileStrategy
-
+from config import CONFIG_DATA_LAKE_FILESYSTEM , CONFIG_DATA_LAKE_PATH, CONFIG_DATA_LAKE_STORAGE_ACCOUNT, CONFIG_AZURE_CREDENTIAL
 from azure.core.exceptions import ResourceNotFoundError
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -78,6 +78,7 @@ from config import (
     CONFIG_USER_BLOB_CONTAINER_CLIENT,
     CONFIG_USER_UPLOAD_ENABLED,
     CONFIG_VECTOR_SEARCH_ENABLED,
+    CONFIG_CREDENTIAL
 )
 from core.authentication import AuthenticationHelper
 from decorators import authenticated, authenticated_path
@@ -405,17 +406,158 @@ async def chat5(auth_claims: Dict[str, Any]):
 
 
 
-@bp.get("/list_folders")
+# @bp.get("/list_folders")
+# @authenticated
+# async def list_folders(auth_claims: Dict[str, Any]):
+#     try:
+#         list_file_strategy: ADLSGen2ListFileStrategy = current_app.config['LIST_FILE_STRATEGY']
+#         folder_names = await list_file_strategy.list_folders()
+#         current_app.logger.info(f"Successfully listed folders: {folder_names}")
+#         return jsonify(folder_names)
+#     except Exception as error:
+#         current_app.logger.error(f"Error listing folders: {error}")
+#         return error_response(error, "/list_folders")
+
+# from prepdocs import setup_list_file_strategy
+# from azure.identity.aio import AzureDeveloperCliCredential
+# from azure.core.credentials_async import AsyncTokenCredential
+
+# @bp.route("/list_folders")
+# @authenticated
+# async def list_folders(auth_claims: Dict[str, Any]):
+#     try:
+#         # Extract configuration from Flask app config
+#         datalake_storage_account = os.getenv("AZURE_ADLS_GEN2_STORAGE_ACCOUNT")
+#         datalake_filesystem = os.getenv("AZURE_ADLS_GEN2_FILESYSTEM")
+#         datalake_path = os.getenv("AZURE_ADLS_GEN2_FILESYSTEM_PATH")
+#         datalake_key = current_app.config.get('DATALAKE_KEY')
+#         local_files = current_app.config.get('LOCAL_FILES', None)
+
+#         # Create an Azure credential
+#         azure_credential: AsyncTokenCredential = AzureDeveloperCliCredential()
+
+#         # Initialize list_file_strategy using setup_list_file_strategy from prepdocs.py
+#         list_file_strategy = setup_list_file_strategy(
+#             azure_credential=azure_credential,
+#             local_files=local_files,
+#             datalake_storage_account=datalake_storage_account,
+#             datalake_filesystem=datalake_filesystem,
+#             datalake_path=datalake_path,
+#             datalake_key=datalake_key,
+#         )
+
+#         # List folders
+#         folder_names = await list_file_strategy.list_folders()
+#         current_app.logger.info(f"Successfully listed folders: {folder_names}")
+#         return jsonify(folder_names)
+#     except Exception as error:
+#         current_app.logger.error(f"Error listing folders: {error}")
+#         return error_response(error, "/list_folders")
+
+
+
+
+from prepdocs import setup_list_file_strategy
+from azure.identity.aio import DefaultAzureCredential
+from azure.core.credentials_async import AsyncTokenCredential
+
+@bp.route("/list_folders")
 @authenticated
 async def list_folders(auth_claims: Dict[str, Any]):
     try:
-        list_file_strategy: ADLSGen2ListFileStrategy = current_app.config['LIST_FILE_STRATEGY']
+        # Extract configuration from Flask app config
+        datalake_storage_account = os.getenv("AZURE_ADLS_GEN2_STORAGE_ACCOUNT")
+        datalake_filesystem = os.getenv("AZURE_ADLS_GEN2_FILESYSTEM")
+        datalake_path = os.getenv("AZURE_ADLS_GEN2_FILESYSTEM_PATH")
+        datalake_key = current_app.config.get('DATALAKE_KEY')
+        # datalake_key = os.getenv("AZURE_DATA_LAKE_KEY")
+        local_files = current_app.config.get('LOCAL_FILES', None)
+
+        
+        
+
+        # Create an Azure credential using DefaultAzureCredential
+        azure_credential: AsyncTokenCredential = DefaultAzureCredential()
+
+        # Initialize list_file_strategy using setup_list_file_strategy from prepdocs.py
+        list_file_strategy = setup_list_file_strategy(
+            azure_credential=azure_credential,
+            local_files=local_files,
+            datalake_storage_account=datalake_storage_account,
+            datalake_filesystem=datalake_filesystem,
+            datalake_path=datalake_path,
+            datalake_key=datalake_key,
+        )
+
+        # List folders
         folder_names = await list_file_strategy.list_folders()
         current_app.logger.info(f"Successfully listed folders: {folder_names}")
+        logging.info("folder_namews : ",folder_names)
         return jsonify(folder_names)
     except Exception as error:
         current_app.logger.error(f"Error listing folders: {error}")
+        logging.info("folder_namews : ",folder_names)
+        logging.info("datalake_storage:", datalake_storage_account)
+        logging.info("data_lake_path", datalake_path)
+        logging.info("data_lake_key", datalake_key)
         return error_response(error, "/list_folders")
+
+
+
+
+
+
+
+
+
+
+
+# from azure.identity.aio import AzureDeveloperCliCredential
+# from azure.core.credentials_async import AsyncTokenCredential
+
+# @bp.route("/list_folders", methods=["GET"])
+# @authenticated
+# async def list_folders(auth_claims: Dict[str, Any]):
+#     """
+#     List folders from a Data Lake Storage account.
+#     """
+#     try:
+#         # Fetch configuration values
+#         data_lake_storage_account = current_app.config[CONFIG_DATA_LAKE_STORAGE_ACCOUNT]
+#         data_lake_filesystem = current_app.config[CONFIG_DATA_LAKE_FILESYSTEM]
+#         data_lake_path = current_app.config[CONFIG_DATA_LAKE_PATH]
+        
+#         azure_credential: AsyncTokenCredential = AzureDeveloperCliCredential()
+
+
+#         # # Ensure credential is in correct format
+#         # if isinstance(credential, str):
+#         #     # Handle conversion if the credential is a string (e.g., get a credential object from the string)
+#         #     # For example, using Azure Identity:
+#         #     from azure.identity.aio import DefaultAzureCredential
+#         #     credential = DefaultAzureCredential()
+
+#         # Create an instance of ADLSGen2ListFileStrategy
+#         strategy = ADLSGen2ListFileStrategy(
+#             data_lake_storage_account=data_lake_storage_account,
+#             data_lake_filesystem=data_lake_filesystem,
+#             data_lake_path=data_lake_path,
+#             credential=azure_credential
+#         )
+        
+#         # Call list_folders method
+#         folders = await strategy.list_folders()
+
+#         # Return folders as JSON
+#         return jsonify(folders)
+
+#     except Exception as e:
+#         current_app.logger.error(f"Error listing folders: {e}")
+#         return jsonify({"error": "Failed to list folders"}), 500
+
+    
+    
+
 
 
 # Send MSAL.js settings to the client UI
@@ -1314,23 +1456,23 @@ def create_app():
     app = Quart(__name__)
     app.register_blueprint(bp)
 
-    data_lake_storage_account = os.getenv('AZURE_ADLS_GEN2_STORAGE_ACCOUNT')
-    data_lake_filesystem = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM')
-    data_lake_path = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM_PATH')
+    # data_lake_storage_account = os.getenv('AZURE_ADLS_GEN2_STORAGE_ACCOUNT')
+    # data_lake_filesystem = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM')
+    # data_lake_path = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM_PATH')
 
-   #changes
-    credential = DefaultAzureCredential()  # Adjust based on your setup
+   
+    # credential = DefaultAzureCredential()  # Adjust based on your setup
 
-    list_file_strategy = ADLSGen2ListFileStrategy(
-        data_lake_storage_account=data_lake_storage_account,
-        data_lake_filesystem=data_lake_filesystem,
-        data_lake_path=data_lake_path,
-        credential=credential
-    )
-#pppp
-    app.config['LIST_FILE_STRATEGY'] = list_file_strategy
+    # list_file_strategy = ADLSGen2ListFileStrategy(
+    #     data_lake_storage_account=data_lake_storage_account,
+    #     data_lake_filesystem=data_lake_filesystem,
+    #     data_lake_path=data_lake_path,
+    #     credential=credential
+    # )
 
-    # Rest of your setup code
+    # app.config['LIST_FILE_STRATEGY'] = list_file_strategy
+
+
 
 
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
