@@ -8,7 +8,9 @@ param environmentName string
 @minLength(1)
 @description('Primary location for all resources')
 param location string
-
+param azure_adls_gen2_filesystem string // Set in main.parameters.json
+param azure_adls_gen2_filesystem_path string // Set in main.parameters.json
+param azure_adls_gen2_storage_account string // Set in main.parameters.json
 param appServicePlanName string = '' // Set in main.parameters.json
 param backendServiceName string = '' // Set in main.parameters.json
 param resourceGroupName string = '' // Set in main.parameters.json
@@ -288,6 +290,9 @@ module backend 'core/host/appservice.bicep' = {
     use32BitWorkerProcess: appServiceSkuName == 'F1'
     alwaysOn: appServiceSkuName != 'F1'
     appSettings: {
+      AZURE_ADLS_GEN2_FILESYSTEM: azure_adls_gen2_filesystem
+      AZURE_ADLS_GEN2_FILESYSTEM_PATH: azure_adls_gen2_filesystem_path
+      AZURE_ADLS_GEN2_STORAGE_ACCOUNT: azure_adls_gen2_storage_account
       AZURE_STORAGE_ACCOUNT: storage.outputs.name
       AZURE_STORAGE_CONTAINER: storageContainerName
       AZURE_SEARCH_INDEX: searchIndexName
@@ -813,7 +818,9 @@ output AZURE_SEARCH_SERVICE string = searchService.outputs.name
 output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
 output AZURE_SEARCH_SEMANTIC_RANKER string = actualSearchServiceSemanticRankerLevel
 output AZURE_SEARCH_SERVICE_ASSIGNED_USERID string = searchService.outputs.principalId
-
+output AZURE_ADLS_GEN2_FILESYSTEM string = azure_adls_gen2_filesystem
+output AZURE_ADLS_GEN2_FILESYSTEM_PATH string = azure_adls_gen2_filesystem_path
+output AZURE_ADLS_GEN2_STORAGE_ACCOUNT string = azure_adls_gen2_storage_account
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
 output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name

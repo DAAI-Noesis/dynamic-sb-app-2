@@ -143,6 +143,13 @@ class AuthenticationHelper:
         use_oid_security_filter = self.require_access_control or overrides.get("use_oid_security_filter")
         use_groups_security_filter = self.require_access_control or overrides.get("use_groups_security_filter")
 
+
+        logging.info(f"function build_security_filters, use_oid_security_filter:", use_oid_security_filter)
+        logging.info(f"function build_security_filters, use_groups_security_filter:", use_groups_security_filter)
+
+        print(f"function build_security_filters, use_oid_security_filter:" , use_oid_security_filter)
+        print(f"function build_security_filters, use_groups_security_filter:" , use_oid_security_filter)
+
         if (use_oid_security_filter or use_groups_security_filter) and not self.has_auth_fields:
             raise AuthError(
                 error="oids and groups must be defined in the search index to use authentication", status_code=400

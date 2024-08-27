@@ -1,38 +1,51 @@
 {
     "files": {
-        "Benefit_Options.pdf": {
-            "directory": "benefitinfo"
+        "ManualdeUtilizador-AnálisedeDesviosdeProduçãoemQuantidade.pdf": {
+            "directory": "Manuais do Utilizador"
         },
-        "employee_handbook.pdf": {
-            "directory": "employeeinfo"
+        "Manual de Utilizador - Análise Origem de Rúbica de PA.pdf": {
+            "directory": "Manuais do Utilizador"
         },
-        "Northwind_Health_Plus_Benefits_Details.pdf": {
-            "directory": "benefitinfo"
+        "Manual de Utilizador - Comparação Valores Reais de Produção Vs Planeados.pdf": {
+            "directory": "Manuais do Utilizador"
         },
-        "Northwind_Standard_Benefits_Details.pdf": {
-            "directory": "benefitinfo"
+        "Manual de Utilizador - Correção Resumo de Provisão - Doct de Regulariz.pdf": {
+            "directory": "Manuais do Utilizador"
         },
-        "PerksPlus.pdf": {
-            "directory": "benefitinfo"
+        "Manual de Utilizador - Correcção de Classificação de Desvios de Produção.pdf": {
+            "directory": "Manuais do Utilizador"
         },
-        "role_library.pdf": {
-            "directory": "employeeinfo"
+        "Manual de Utilizador - Diário de Doctºs por Conta de GL.pdf": {
+            "directory": "Manuais do Utilizador"
+        },
+        "PDP - Fluxos IEC_v2.pdf": {
+            "directory": "Fluxos"
+        },
+        "PDP - Fluxos IEC.pdf": {
+            "directory": "Fluxos"
+        },
+        "SBGCX_RequisitosFuncionais-excel.pdf": {
+            "directory": "SBGCX Requisitos Funcionais"
+        },
+        "SBGCX_RequisitosFuncionais-word.pdf": {
+            "directory": "SBGCX Requisitos Funcionais"
         }
     },
     "directories": {
-        "employeeinfo": {
-            "groups": ["GPTKB_HRTest"]
+        "Fluxos": {
+            "groups": ["azu-team-noe-an"]
         },
-        "benefitinfo": {
-            "groups": ["GPTKB_EmployeeTest", "GPTKB_HRTest"]
+        "Manuais do Utilizador": {
+            "groups": ["azu-team-noe-an"]
         },
-        "/": {
-            "groups": ["GPTKB_AdminTest"]
+        "SBGCX Requisitos Funcionais": {
+            "groups": ["azu-team-noe-an"]
         }
     },
     "groups": [
-        "GPTKB_AdminTest",
-        "GPTKB_HRTest",
-        "GPTKB_EmployeeTest"
+        "azu-team-noe-an"
     ]
 }
+
+
+

@@ -147,6 +147,7 @@ class ManageAcl:
     async def enable_acls(self, endpoint: str):
         async with SearchIndexClient(endpoint=endpoint, credential=self.credentials) as search_index_client:
             logger.info(f"Enabling acls for index {self.index_name}")
+            print(f"Enabling acls for index {self.index_name}")
             index_definition = await search_index_client.get_index(self.index_name)
             if not any(field.name == "oids" for field in index_definition.fields):
                 index_definition.fields.append(

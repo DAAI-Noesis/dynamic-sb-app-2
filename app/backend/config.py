@@ -42,7 +42,8 @@ CONFIG_LIST_FILE_STRATEGY = "list_file_strategy"
 CONFIG_DATA_LAKE_STORAGE_ACCOUNT = "data_lake_storage_account"
 CONFIG_DATA_LAKE_FILESYSTEM = "data_lake_filesystem"
 CONFIG_DATA_LAKE_PATH = "data_lake_path"
-CONFIG_AZURE_CREDENTIAL = "azure_credential"  
+# CONFIG_AZURE_CREDENTIAL = "azure_credential"  
+# CONFIG_DATA_LAKE_KEY = "data_lake_key"
 
 
 

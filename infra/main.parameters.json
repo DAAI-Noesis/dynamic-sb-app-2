@@ -247,6 +247,15 @@
     },
     "runningOnAdo": {
       "value": "${TF_BUILD}"
+    },
+    "azure_adls_gen2_filesystem": {
+      "value": "${AZURE_ADLS_GEN2_FILESYSTEM}"
+    },
+    "azure_adls_gen2_filesystem_path": {
+      "value": "${AZURE_ADLS_GEN2_FILESYSTEM_PATH}"
+    },
+    "azure_adls_gen2_storage_account": {
+      "value": "${AZURE_ADLS_GEN2_STORAGE_ACCOUNT}"
     }
   }
 }

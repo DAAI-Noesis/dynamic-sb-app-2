@@ -1,5 +1,5 @@
 from typing import Any, Coroutine, List, Literal, Optional, Union, overload
-
+import logging
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import VectorQuery
 from openai import AsyncOpenAI, AsyncStream
@@ -157,6 +157,10 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         # Only keep the text query if the retrieval mode uses text, otherwise drop it
         if not has_text:
             query_text = None
+
+        print(f"filters:", filter) 
+        logging.info(f"filters:", filter)
+
 
         results = await self.search(
             top,

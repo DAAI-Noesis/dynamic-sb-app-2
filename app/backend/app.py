@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Union, cast
 from prepdocslib.listfilestrategy import ADLSGen2ListFileStrategy
-from config import CONFIG_DATA_LAKE_FILESYSTEM , CONFIG_DATA_LAKE_PATH, CONFIG_DATA_LAKE_STORAGE_ACCOUNT, CONFIG_AZURE_CREDENTIAL
+# from config import CONFIG_DATA_LAKE_FILESYSTEM , CONFIG_DATA_LAKE_PATH, CONFIG_DATA_LAKE_STORAGE_ACCOUNT, CONFIG_AZURE_CREDENTIAL
 from azure.core.exceptions import ResourceNotFoundError
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -496,10 +496,11 @@ async def list_folders(auth_claims: Dict[str, Any]):
         return jsonify(folder_names)
     except Exception as error:
         current_app.logger.error(f"Error listing folders: {error}")
-        logging.info("folder_namews : ",folder_names)
-        logging.info("datalake_storage:", datalake_storage_account)
-        logging.info("data_lake_path", datalake_path)
-        logging.info("data_lake_key", datalake_key)
+        current_app.logger.error(f"foldernames: {folder_names}")
+        current_app.logger.error(f"datalake: {datalake_storage_account}")
+        current_app.logger.error(f"datalakepaths: {datalake_path}")
+        current_app.logger.error(f"datalake filesystem: {datalake_filesystem}")
+      
         return error_response(error, "/list_folders")
 
 
@@ -563,7 +564,7 @@ async def list_folders(auth_claims: Dict[str, Any]):
 # Send MSAL.js settings to the client UI
 @bp.route("/auth_setup", methods=["GET"])
 def auth_setup():
-    auth_helper = current_app.config[CONFIG_AUTH_CLIENT]
+    auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
     return jsonify(auth_helper.get_auth_setup_for_client())
 
 
@@ -1178,7 +1179,7 @@ async def setup_clients():
 
 @bp.after_app_serving
 async def close_clients():
-    await current_app.config[CONFIG_SEARCH_CLIENT].close()
+    await current_app.config[CONFIG_SEARCH_CLIENT_T1].close()
     await current_app.config[CONFIG_BLOB_CONTAINER_CLIENT].close()
     if current_app.config.get(CONFIG_USER_BLOB_CONTAINER_CLIENT):
         await current_app.config[CONFIG_USER_BLOB_CONTAINER_CLIENT].close()

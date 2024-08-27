@@ -13,7 +13,7 @@ from typing import (
     cast,
 )
 from urllib.parse import urljoin
-
+import logging
 import aiohttp
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import (
@@ -121,11 +121,17 @@ class Approach(ABC):
     def build_filter(self, overrides: dict[str, Any], auth_claims: dict[str, Any]) -> Optional[str]:
         exclude_category = overrides.get("exclude_category")
         security_filter = self.auth_helper.build_security_filters(overrides, auth_claims)
+        print(f"def build_filter: printing security filter: ", security_filter)
+        logging.info(f"def build_filter: printing security filter:", security_filter)
         filters = []
         if exclude_category:
             filters.append("category ne '{}'".format(exclude_category.replace("'", "''")))
         if security_filter:
+            print("entring in security_filter")
+            logging.info("build_filter- entring in security_filter")
             filters.append(security_filter)
+            logging.info(f"def buid_filter - Filters:",filters)
+            print(f"Filters:", filters)
         return None if len(filters) == 0 else " and ".join(filters)
 
     async def search(
