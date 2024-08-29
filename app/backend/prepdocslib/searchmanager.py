@@ -488,7 +488,7 @@ class SearchManager:
                             ),
                         )
                         await search_index_client.create_or_update_index(index_definition)
-
+                        
     async def update_content(
         self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
     ):
@@ -532,6 +532,62 @@ class SearchManager:
                         document["imageEmbedding"] = image_embeddings[section.split_page.page_num]
 
                 await search_client.upload_documents(documents)
+                
+    async def update_partial_content(
+    self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
+    ):
+        MAX_BATCH_SIZE = 1000
+        section_batches = [sections[i: i + MAX_BATCH_SIZE] for i in range(0, len(sections), MAX_BATCH_SIZE)]
+
+        async with self.search_info.create_search_client(index_name) as search_client:
+            for batch_index, batch in enumerate(section_batches):
+                for section_index, section in enumerate(batch):
+                    sourcepage_value = (
+                        BlobManager.blob_image_name_from_file_page(
+                            filename=section.content.filename(),
+                            page=section.split_page.page_num,
+                        )
+                        if image_embeddings
+                        else BlobManager.sourcepage_from_file_page(
+                            filename=section.content.filename(),
+                            page=section.split_page.page_num,
+                        )
+                    )
+                    
+                    # logger.info("sourcepage_value= '%s'", sourcepage_value)
+                    
+                    # Search for the document using sourcepage value
+                    results = await search_client.search(
+                        search_text="",  # Empty search text, we are using filter
+                        filter=f"sourcepage eq '{sourcepage_value}'"
+                    )
+                    
+                    # logger.info("results= '%s'", results)
+                    
+                    # Iterate through results to update each matching document
+                    async for result in results:
+                        document_id = result['id']
+                        
+                        # logger.info("document_id= '%s'", document_id)
+                        
+                        # Prepare the update payload
+                        update_document = {
+                            "id": document_id,
+                            "oids": section.content.acls.get("oids", None),  # Update with new oids
+                            "groups": section.content.acls.get("groups", None),  # Update with new groups
+                            "@search.action": "merge"  # Partial update action
+                        }
+                        
+                        # logger.info("update_document= '%s'", update_document)
+                        
+                        # Remove None values
+                        update_document = {k: v for k, v in update_document.items() if v is not None}
+                        
+                        # logger.info("update_document= '%s'", update_document)
+                        
+                        # Perform the partial update
+                        await search_client.upload_documents([update_document])
+
 
     async def remove_content(self, path: Optional[str] = None, only_oid: Optional[str] = None):
         logger.info(
@@ -566,3 +622,32 @@ class SearchManager:
                 logger.info("Removed %d sections from index", len(removed_docs))
                 # It can take a few seconds for search results to reflect changes, so wait a bit
                 await asyncio.sleep(2)
+                
+    # # metodo para verificar se os search index contem ficheiros
+    # async def index_has_documents(self, index_name: str) -> bool:
+    #     async with self.search_info.create_search_client(index_name) as search_client:
+    #         logger.info("index_has_documents")
+    #         logger.info("index_name='%s'", index_name)
+    #         result = await search_client.search(search_text="", top=1)  # Retrieve just one document
+    #         logger.info("result='%s'", result)
+    #         async for _ in result:
+    #             return True  # If we get any document, the index has content
+    #     return False  # If no document is found, the index is empty
+    
+    async def index_has_documents(self, index_name: str) -> bool:
+        """
+        Check if the given index contains any documents.
+        """
+        async with self.search_info.create_search_client(index_name) as search_client:
+            logger.info("Check if index_has_documents")
+            logger.info("index_name='%s'", index_name)
+            logger.info("search_client='%s'", search_client)
+            # Perform a simple search with no filters to count the number of documents
+            # result = await search_client.search(search_text="", top=1)  # Get only the first document
+            # result_count = await result.get_count()
+            # logger.info("result_count='%s'", result_count)
+            result = await search_client.get_document_count()
+            logger.info("result='%s'", result)
+            return result > 0
+
+

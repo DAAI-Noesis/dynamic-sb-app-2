@@ -228,6 +228,7 @@ async def main(args: Any):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Manage ACLs in a search index",
+        # epilog="Example: manageacl.py --searchservice mysearch --index myindex --acl-action enable_acls",
         epilog="Example: manageacl.py --searchservice mysearch --index_t1 --index_t2 --index_t3 --index_t4 --index_t5 --index_t6 --index_t7 myindex --acl-action enable_acls",
     )
     parser.add_argument(

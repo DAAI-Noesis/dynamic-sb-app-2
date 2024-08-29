@@ -93,14 +93,33 @@ from prepdocslib.filestrategy import UploadUserFileStrategy
 from prepdocslib.listfilestrategy import File
 from quart import Quart, Blueprint
 from azure.core.credentials import AzureNamedKeyCredential
-import os
 import logging
+from prepdocs import setup_list_file_strategy
+from azure.identity.aio import DefaultAzureCredential
+from azure.core.credentials_async import AsyncTokenCredential
 
+import os.path
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, insert,select,update,and_,DateTime,Boolean
 
 bp = Blueprint("routes", __name__, static_folder="static")
 # Fix Windows registry issue with mimetypes
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
+
+
+# Initialize SQLAlchemy engine and metadata
+database_url = os.getenv('SQLALCHEMY_DATABASE_URL')
+engine = create_engine(database_url)
+metadata = MetaData()
+
+# Define your table schema
+Feedback = Table(
+    'Feedback', metadata,
+    Column('UserQuestion', String, nullable=True),
+    Column('BotMessage', String, nullable=True),
+    Column('UserFeedback', Boolean, nullable=True),
+    schema='dbo'
+)
 
 
 @bp.route("/")
@@ -126,6 +145,7 @@ async def assets(path):
 
 
 @bp.route("/content/<path>")
+# @authenticated_path(config_auth_client=CONFIG_AUTH_CLIENT, config_search_client=CONFIG_SEARCH_CLIENT)
 @authenticated_path
 async def content_file(path: str, auth_claims: Dict[str, Any]):
     """
@@ -193,7 +213,8 @@ async def content_file(path: str, auth_claims: Dict[str, Any]):
 #         return error_response(error, "/ask")
     
 @bp.route("/ask", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
+# @authenticated
 async def ask(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -242,7 +263,8 @@ async def format_as_ndjson(r: AsyncGenerator[dict, None]) -> AsyncGenerator[str,
 
 
 @bp.route("/chat", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T2)
+# @authenticated
 async def chat(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -275,7 +297,8 @@ async def chat(auth_claims: Dict[str, Any]):
 
 
 @bp.route("/chat2", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T3)
+# @authenticated
 async def chat2(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -308,7 +331,8 @@ async def chat2(auth_claims: Dict[str, Any]):
 
 
 @bp.route("/chat3", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T4)
+# @authenticated
 async def chat3(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -340,7 +364,8 @@ async def chat3(auth_claims: Dict[str, Any]):
         return error_response(error, "/chat3")    
 
 @bp.route("/chat4", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T5)
+# @authenticated
 async def chat4(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -373,7 +398,8 @@ async def chat4(auth_claims: Dict[str, Any]):
 
 
 @bp.route("/chat5", methods=["POST"])
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T6)
+# @authenticated
 async def chat5(auth_claims: Dict[str, Any]):
     if not request.is_json:
         return jsonify({"error": "request must be json"}), 415
@@ -456,13 +482,9 @@ async def chat5(auth_claims: Dict[str, Any]):
 
 
 
-
-from prepdocs import setup_list_file_strategy
-from azure.identity.aio import DefaultAzureCredential
-from azure.core.credentials_async import AsyncTokenCredential
-
 @bp.route("/list_folders")
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
+# @authenticated
 async def list_folders(auth_claims: Dict[str, Any]):
     try:
         # Extract configuration from Flask app config
@@ -472,13 +494,10 @@ async def list_folders(auth_claims: Dict[str, Any]):
         datalake_key = current_app.config.get('DATALAKE_KEY')
         # datalake_key = os.getenv("AZURE_DATA_LAKE_KEY")
         local_files = current_app.config.get('LOCAL_FILES', None)
-
         
-        
-
         # Create an Azure credential using DefaultAzureCredential
         azure_credential: AsyncTokenCredential = DefaultAzureCredential()
-
+        
         # Initialize list_file_strategy using setup_list_file_strategy from prepdocs.py
         list_file_strategy = setup_list_file_strategy(
             azure_credential=azure_credential,
@@ -488,11 +507,11 @@ async def list_folders(auth_claims: Dict[str, Any]):
             datalake_path=datalake_path,
             datalake_key=datalake_key,
         )
-
+        
         # List folders
         folder_names = await list_file_strategy.list_folders()
         current_app.logger.info(f"Successfully listed folders: {folder_names}")
-        logging.info("folder_namews : ",folder_names)
+        logging.info("folder_names : ",folder_names)
         return jsonify(folder_names)
     except Exception as error:
         current_app.logger.error(f"Error listing folders: {error}")
@@ -500,7 +519,7 @@ async def list_folders(auth_claims: Dict[str, Any]):
         current_app.logger.error(f"datalake: {datalake_storage_account}")
         current_app.logger.error(f"datalakepaths: {datalake_path}")
         current_app.logger.error(f"datalake filesystem: {datalake_filesystem}")
-      
+        
         return error_response(error, "/list_folders")
 
 
@@ -581,7 +600,8 @@ def config():
 
 
 @bp.post("/upload")
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
+# @authenticated
 async def upload(auth_claims: dict[str, Any]):
     request_files = await request.files
     if "file" not in request_files:
@@ -610,7 +630,8 @@ async def upload(auth_claims: dict[str, Any]):
 
 
 @bp.post("/delete_uploaded")
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
+# @authenticated
 async def delete_uploaded(auth_claims: dict[str, Any]):
     request_json = await request.get_json()
     filename = request_json.get("filename")
@@ -625,7 +646,8 @@ async def delete_uploaded(auth_claims: dict[str, Any]):
 
 
 @bp.get("/list_uploaded")
-@authenticated
+@authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
+# @authenticated
 async def list_uploaded(auth_claims: dict[str, Any]):
     user_oid = auth_claims["oid"]
     user_blob_container_client: FileSystemClient = current_app.config[CONFIG_USER_BLOB_CONTAINER_CLIENT]
@@ -679,6 +701,46 @@ async def list_uploaded(auth_claims: dict[str, Any]):
 #         current_app.logger.error(f"Error listing folders: {error}")
 #         return error_response(error, "/list_folders")
 
+@bp.route("/feedback_insert", methods=["POST"])
+async def feedback_insert():
+    logging.info('Processing a request to insert feedback.')
+    
+    try:
+        req_body = await request.get_json()
+        
+        with engine.connect() as connection:
+            # Begin a transaction
+            transaction = connection.begin()
+            
+            try:
+                # Insert records into the Feedback table
+                stmt = insert(Feedback)
+                connection.execute(stmt, req_body)
+                transaction.commit()
+                
+                response_content = {
+                    "body": "Data processed and inserted successfully",
+                    "status_code": 201
+                }
+                return jsonify(response_content), 201
+            
+            
+            except Exception as e:
+                transaction.rollback()
+                logging.error(f"Error inserting feedback: {e}")
+                response_content = {
+                    "body": "Error",
+                    "status_code": 400
+                }
+                return jsonify(response_content), 400
+            
+    except Exception as e:
+        logging.error(f"Error processing request: {e}")
+        response_content = {
+            "body": "Error",
+            "status_code": 400
+        }
+        return jsonify(response_content), 400
 
 
 @bp.before_app_serving
@@ -1461,7 +1523,7 @@ def create_app():
     # data_lake_filesystem = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM')
     # data_lake_path = os.getenv('AZURE_ADLS_GEN2_FILESYSTEM_PATH')
 
-   
+    
     # credential = DefaultAzureCredential()  # Adjust based on your setup
 
     # list_file_strategy = ADLSGen2ListFileStrategy(

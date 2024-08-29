@@ -28,6 +28,7 @@ import {
   chat4Api,
   chat5Api,
   configApi,
+  feedbackApi,
   RetrievalMode,
   ChatAppResponse,
   ChatAppResponseOrError,
@@ -93,8 +94,17 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       const jsonData = JSON.stringify(data)
 
       try {
-        const response = await axios.post("http://localhost:7071/api/Feedback_insert", jsonData);
-        console.log(response.data);
+        // const response = await axios.post("http://localhost:7071/api/Feedback_insert", jsonData);
+        // console.log(response.data);
+
+        // const response = await axios.post("http://localhost:50505/feedback_insert", jsonData, {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
+        // console.log(response.data);
+        
+        feedbackApi(jsonData)
       } catch (error) {
         console.error('Error sending feedback:', error);
       }

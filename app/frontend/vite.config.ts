@@ -35,6 +35,7 @@ export default defineConfig({
             "/chat4": "http://localhost:50505",
             "/chat5": "http://localhost:50505",
             "/list_folders": "http://localhost:50505",
+            "/feedback_insert": "http://localhost:50505",
             "/config": "http://localhost:50505",
             "/upload": "http://localhost:50505",
             "/delete_uploaded": "http://localhost:50505",

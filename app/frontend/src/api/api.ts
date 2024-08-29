@@ -142,6 +142,19 @@ export async function listFoldersApi(idToken: string | undefined): Promise<strin
   }
 }
 
+export async function feedbackApi(
+  answer: string
+): Promise<Response> {
+  return await fetch(`${BACKEND_URI}/feedback_insert`, {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json', // Set the content type to JSON
+    },
+    body: answer
+  });
+}
+
+
 // export async function listFoldersApi(idToken: string | undefined): Promise<string[]> {
 //   try {
 //     const response = await fetch(`${BACKEND_URI}/list_folders`, {

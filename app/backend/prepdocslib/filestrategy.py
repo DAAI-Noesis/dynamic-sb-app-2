@@ -7,6 +7,7 @@ from .fileprocessor import FileProcessor
 from .listfilestrategy import File, ListFileStrategy
 from .searchmanager import SearchManager, Section
 from .strategy import DocumentAction, SearchInfo, Strategy
+import urllib.parse
 
 logger = logging.getLogger("ingester")
 
@@ -358,14 +359,19 @@ class FileStrategy(Strategy):
             self.search_info, self.search_analyzer_name, self.use_acls, False, self.embeddings
         )
         
+        partial_update = False
+        
         if self.document_action == DocumentAction.Add:
             files = self.list_file_strategy.list()
+            # logger.info("files='%s'", files)
             index_name_list = search_info.index_name_list
+            # logger.info("index_name_list='%s'", index_name_list)
             index_count = len(index_name_list)
-
+            # logger.info("index_count='%s'", index_count)
+            
             folder_to_index = {}  # Maps folder paths to index names
             index_counter = 0
-
+            
             async for file in files:
                 try:
                     key = file.file_extension()
@@ -375,17 +381,56 @@ class FileStrategy(Strategy):
                         continue
                     
                     folder_path = file.extract_folder_path()
+                    # logger.info("\nfolder_path='%s'", folder_path)
                     
-                    # If folder is not yet assigned, assign the next available index
                     if folder_path not in folder_to_index:
-                        index_name = index_name_list[index_counter % index_count]
-                        folder_to_index[folder_path] = index_name
-                        index_counter += 1  # Move to the next index
-
+                        # logger.info("FOLDER PATH NOT IN")
+                        skip = False
+                        while index_counter < index_count and skip==False:
+                            # logger.info("while index_counter < index_count")
+                            index_name = index_name_list[index_counter % index_count]
+                            # logger.info("index_name='%s'", index_name)                            
+                            
+                            # logger.info("Check if the index has documents")
+                            # Check if the index has documents, if the index has documents it does not enter this if
+                            if not await search_manager.index_has_documents(index_name):
+                                folder_to_index[folder_path] = index_name
+                                # logger.info("folder_to_index[folder_path]='%s'", folder_to_index[folder_path])
+                                break
+                            
+                            # Check if the name of the folder is the same
+                            async with self.search_info.create_search_client(index_name) as search_client:
+                                documents = await search_client.search(search_text="", top=1, select=["storageUrl"])
+                                async for document in documents:
+                                    # logger.info("document[storage_url]='%s'", document["storageUrl"])
+                                    start_index = document["storageUrl"].find('https://sagenaidev003.dfs.core.windows.net/content/') + len('https://sagenaidev003.dfs.core.windows.net/content/')
+                                    end_index = document["storageUrl"].find('%2F')
+                                    desired_string = document["storageUrl"][start_index:end_index]
+                                    encoded_folder_path = urllib.parse.quote(folder_path)
+                                    
+                                    # Check if the encoded_folder_path exists in storage_url
+                                    if encoded_folder_path in desired_string:
+                                        folder_to_index[folder_path] = index_name
+                                        # logger.info("folder_to_index[folder_path]='%s'", folder_to_index[folder_path])
+                                        skip = True
+                                        partial_update = True
+                                    else:
+                                        # logger.info("index_counter += 1")
+                                        index_counter += 1  # Move to the next index
+                                if skip:
+                                    break
+                            
+                        # If no empty index was found
+                        if folder_path not in folder_to_index:
+                            raise Exception("No empty index available for new folder.")
+                            
+                        
+                    # logger.info("FOLDER PATH IS IN")
                     index_name = folder_to_index[folder_path]
+                    # logger.info("index_name='%s'", index_name)
                     
                     print(f"Processing files in folder '{folder_path}' with index '{index_name}'")
-
+                    
                     print(f"Parsing '{file.filename()}'")
                     
                     pages = [page async for page in processor.parser.parse(content=file.content)]
@@ -394,13 +439,18 @@ class FileStrategy(Strategy):
                         Section(split_page, content=file, category=self.category)
                         for split_page in processor.splitter.split_pages(pages)
                     ]
-
+                    
+                    
                     if sections:
                         blob_sas_uris = await self.blob_manager.upload_blob(file)
                         blob_image_embeddings: Optional[List[List[float]]] = None
                         if self.image_embeddings and blob_sas_uris:
                             blob_image_embeddings = await self.image_embeddings.create_embeddings(blob_sas_uris)
-                        await search_manager.update_content(index_name, sections, blob_image_embeddings, url=file.url)
+                        if partial_update:
+                            # logger.info("PARTIAL_UPDATE")
+                            await search_manager.update_partial_content(index_name, sections, blob_image_embeddings, url=file.url)
+                        else:
+                            await search_manager.update_content(index_name, sections, blob_image_embeddings, url=file.url)
                 
                 finally:
                     if file:
@@ -414,7 +464,7 @@ class FileStrategy(Strategy):
         elif self.document_action == DocumentAction.RemoveAll:
             await self.blob_manager.remove_blob()
             await search_manager.remove_content()
-     
+    
     
     async def get_folder_names(self):
         files = self.list_file_strategy.list()

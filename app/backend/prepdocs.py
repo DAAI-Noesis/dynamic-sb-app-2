@@ -219,8 +219,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Prepare documents by extracting content from PDFs, splitting content into sections, uploading to blob storage, and indexing in a search index.",
         # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 myindex -v",
-       # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v",
-         epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 --index_t4 --index_t5 --index_t6 --index_t7 myindex -v",
+        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v",
+        epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 --index_t4 --index_t5 --index_t6 --index_t7 myindex -v",
         # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 myindex -v",
     )
     parser.add_argument("files", nargs="?", help="Files to be processed")
@@ -427,7 +427,7 @@ if __name__ == "__main__":
             search_service=args.searchservice,
             #index_name=args.index,
             # index_name_list = ["index_t1","index_t2","index_t3"],
-             index_name_list = ["index_t1","index_t2","index_t3","index_t4","index_t5","index_t6","index_t7"],
+            index_name_list = ["index_t1","index_t2","index_t3","index_t4","index_t5","index_t6","index_t7"],
             # index_name_list=["index_t1","index_t2"],
             azure_credential=azd_credential,
             search_key=clean_key_if_exists(args.searchkey),

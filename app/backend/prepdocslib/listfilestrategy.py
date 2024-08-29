@@ -8,6 +8,7 @@ from abc import ABC
 from glob import glob
 from typing import IO, AsyncGenerator, Dict, List, Optional, Union
 import urllib.parse
+from datetime import datetime  # Import datetime for handling timestamps
 from azure.core.credentials_async import AsyncTokenCredential
 from azure.storage.filedatalake.aio import (
     DataLakeServiceClient,
@@ -104,7 +105,7 @@ class LocalListFileStrategy(ListFileStrategy):
         # if filename ends in .md5 skip
         if path.endswith(".md5"):
             return True
-
+        
         # if there is a file called .md5 in this directory, see if its updated
         stored_hash = None
         with open(path, "rb") as file:
@@ -113,15 +114,15 @@ class LocalListFileStrategy(ListFileStrategy):
         if os.path.exists(hash_path):
             with open(hash_path, encoding="utf-8") as md5_f:
                 stored_hash = md5_f.read()
-
+                
         if stored_hash and stored_hash.strip() == existing_hash.strip():
             logger.info("Skipping %s, no changes detected.", path)
             return True
-
+        
         # Write the hash
         with open(hash_path, "w", encoding="utf-8") as md5_f:
             md5_f.write(existing_hash)
-
+            
         return False
 
 
@@ -220,75 +221,147 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
 
                 print(f"Found file path: {path.name}")
                 yield path.name
-    
-    # async def list_folders(self) -> List[str]:
-    #     folder_names = set()
-    #     async with DataLakeServiceClient(
-    #         account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
-    #     ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
-    #         async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
-    #             if path.is_directory:
-    #                 folder_names.add(path.name)
-    #             else:
-    #                 folder_path = os.path.dirname(path.name)
-    #                 folder_names.add(folder_path)
-    #     return sorted(folder_names)
-    # async def list_folders(self) -> List[str]:
-    #     folder_names = set()
-    #     async with DataLakeServiceClient(
-    #         account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
-    #     ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
-    #         async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
-    #             if path.is_directory:
-    #                 folder_names.add(path.name.split('/')[0])  # Adiciona apenas o nome da pasta raiz
-    #             else:
-    #                 folder_path = path.name.split('/')[0]  # Adiciona apenas o nome da pasta raiz
-    #                 folder_names.add(folder_path)
-    #                 print(folder_names)
-    #     return sorted(folder_names)
 
     async def list_folders(self) -> List[str]:
-       folder_names = set()
-       try:
-         current_app.logger.info("Starting to list folders")
-         async with DataLakeServiceClient(
-            account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", 
-            credential=self.credential
-        ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+        # folder_names = set()
+        # folder_details = []
+        folder_map: Dict[str, datetime] = {}  # Map to store folder name and its latest creation time
+        try:
+            current_app.logger.info("Starting to list folders")
+            async with DataLakeServiceClient(
+                account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", 
+                credential=self.credential
+            ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+                
+                async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
+                    current_app.logger.info(f"Processing path: {path.name}")
+                    
+                    if path.is_directory:
+                        # folder_names.add(path.name.split('/')[0])  # Add root folder name only
+                        folder_name = path.name.split('/')[0]  # Get root folder name only
+                        # folder_details.append((folder_name, path.creation_time))
+                        
+                        # Update the map with the folder name and its latest creation time
+                        if folder_name not in folder_map or path.creation_time > folder_map[folder_name]:
+                            folder_map[folder_name] = path.creation_time
+                    # else:
+                    #     folder_path = path.name.split('/')[0]  # Add root folder name only
+                    #     # folder_names.add(folder_path)
+                    #     folder_details.append((folder_path, path.creation_time))
+                    
+                    # current_app.logger.info(f"Current folder names set: {folder_names}")
+                    # current_app.logger.info(f"Current folder details: {folder_details}")
+                    
+                    # Not necessary to handle files separately as we are only interested in directories
+                    current_app.logger.info(f"Current folder map: {folder_map}")
+                    
+            # # Sort folders by creation time
+            # folder_details = sorted(set(folder_details), key=lambda x: x[1])
             
-            async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
-                current_app.logger.info(f"Processing path: {path.name}")
+            # # Extract just the folder names in the sorted order
+            # sorted_folder_names = [folder[0] for folder in folder_details]
+            
+            # Sort folders by creation time
+            sorted_folder_names = sorted(folder_map.keys(), key=lambda x: folder_map[x])
 
-                if path.is_directory:
-                    folder_names.add(path.name.split('/')[0])  # Add root folder name only
-                else:
-                    folder_path = path.name.split('/')[0]  # Add root folder name only
-                    folder_names.add(folder_path)
 
-                current_app.logger.info(f"Current folder names set: {folder_names}")
+            # current_app.logger.info(f"Successfully listed folders: {folder_names}")
+            # return sorted(folder_names)
+            current_app.logger.info(f"Successfully listed folders by creation time: {sorted_folder_names}")
+            return sorted_folder_names
 
-         current_app.logger.info(f"Successfully listed folders: {folder_names}")
-         return sorted(folder_names)
-
-       except ValueError as ve:
-           current_app.logger.error(f"ValueError in list_folders: {ve}")
-           raise
-       except Exception as e:
-           current_app.logger.error(f"Unexpected error in list_folders: {e}")
-           raise
+        except ValueError as ve:
+            current_app.logger.error(f"ValueError in list_folders: {ve}")
+            raise
+        except Exception as e:
+            current_app.logger.error(f"Unexpected error in list_folders: {e}")
+            raise
     
+    # async def list(self) -> AsyncGenerator[File, None]:
+    #     async with DataLakeServiceClient(
+    #         account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
+    #     ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
+    #         async for path in self.list_paths():
+    #             if not self.check_md5(path):
+    #                 # yield File(content=open(path, mode="rb"))
+    #                 temp_file_path = os.path.join(tempfile.gettempdir(), os.path.basename(path))
+    #                 try:
+    #                     async with filesystem_client.get_file_client(path) as file_client:
+    #                         with open(temp_file_path, "wb") as temp_file:
+    #                             downloader = await file_client.download_file()
+    #                             await downloader.readinto(temp_file)
+    #                     # Parse out user ids and group ids
+    #                     acls: Dict[str, List[str]] = {"oids": [], "groups": []}
+    #                     access_control = await file_client.get_access_control(upn=False)
+    #                     acl_list = access_control["acl"]
+    #                     acl_list = acl_list.split(",")
+    #                     for acl in acl_list:
+    #                         acl_parts: list = acl.split(":")
+    #                         if len(acl_parts) != 3:
+    #                             continue
+    #                         if len(acl_parts[1]) == 0:
+    #                             continue
+    #                         if acl_parts[0] == "user" and "r" in acl_parts[2]:
+    #                             acls["oids"].append(acl_parts[1])
+    #                         if acl_parts[0] == "group" and "r" in acl_parts[2]:
+    #                             acls["groups"].append(acl_parts[1])
+    #                     yield File(content=open(temp_file_path, "rb"), acls=acls, url=file_client.url)
+    #                 except Exception as data_lake_exception:
+    #                     logger.error(f"Got an error while reading {path} -> {data_lake_exception} --> skipping file")
+    #                     try:
+    #                         os.remove(temp_file_path)
+    #                     except Exception as file_delete_exception:
+    #                         logger.error(f"Got an error while deleting {temp_file_path} -> {file_delete_exception}")
+                        
+    # # async def list(self) -> AsyncGenerator[File, None]:
+    # #     async for path in self.list_paths():
+    # #         if not self.check_md5(path):
+    # #             yield File(content=open(path, mode="rb"))
 
+    # def check_md5(self, path: str) -> bool:
+    #     # if filename ends in .md5 skip
+    #     if path.endswith(".md5"):
+    #         return True
+        
+    #     # if there is a file called .md5 in this directory, see if its updated
+    #     stored_hash = None
+    #     with open(path, "rb") as file:
+    #         existing_hash = hashlib.md5(file.read()).hexdigest()
+    #     hash_path = f"{path}.md5"
+    #     if os.path.exists(hash_path):
+    #         with open(hash_path, encoding="utf-8") as md5_f:
+    #             stored_hash = md5_f.read()
+                
+    #     if stored_hash and stored_hash.strip() == existing_hash.strip():
+    #         logger.info("Skipping %s, no changes detected.", path)
+    #         return True
+        
+    #     # Write the hash
+    #     with open(hash_path, "w", encoding="utf-8") as md5_f:
+    #         md5_f.write(existing_hash)
+            
+    #     return False
+    
     async def list(self) -> AsyncGenerator[File, None]:
         async with DataLakeServiceClient(
             account_url=f"https://{self.data_lake_storage_account}.dfs.core.windows.net", credential=self.credential
         ) as service_client, service_client.get_file_system_client(self.data_lake_filesystem) as filesystem_client:
             async for path in self.list_paths():
                 temp_file_path = os.path.join(tempfile.gettempdir(), os.path.basename(path))
+                
+                # Check for existing MD5 hash and skip if it matches
+                if await self.check_md5(path, filesystem_client):
+                    continue
+                
                 try:
                     async with filesystem_client.get_file_client(path) as file_client:
                         with open(temp_file_path, "wb") as temp_file:
                             downloader = await file_client.download_file()
                             await downloader.readinto(temp_file)
+                            
+                    # Compute MD5 hash for the new file and store it
+                    await self.store_md5(path, filesystem_client)
+                    
                     # Parse out user ids and group ids
                     acls: Dict[str, List[str]] = {"oids": [], "groups": []}
                     access_control = await file_client.get_access_control(upn=False)
@@ -307,7 +380,69 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
                     yield File(content=open(temp_file_path, "rb"), acls=acls, url=file_client.url)
                 except Exception as data_lake_exception:
                     logger.error(f"Got an error while reading {path} -> {data_lake_exception} --> skipping file")
+                finally:
                     try:
                         os.remove(temp_file_path)
                     except Exception as file_delete_exception:
                         logger.error(f"Got an error while deleting {temp_file_path} -> {file_delete_exception}")
+    
+    
+    async def check_md5(self, path: str, filesystem_client) -> bool:
+        """
+        Check if the MD5 hash of the file at `path` matches the stored hash.
+        """
+        hash_path = f"{path}.md5"
+        md5_client = filesystem_client.get_file_client(hash_path)
+    
+        # Skip if the file itself is an MD5 file
+        if path.endswith(".md5"):
+            return True
+    
+        # Download the file content to compute its MD5 hash
+        async with filesystem_client.get_file_client(path) as file_client:
+            try:
+                downloader = await file_client.download_file()
+                content = await downloader.readall()
+                existing_hash = hashlib.md5(content).hexdigest()
+            except Exception as e:
+                logger.error(f"Error downloading file for hash calculation: {e}")
+                return False
+    
+        # Check if the MD5 hash file exists
+        try:
+            md5_downloader = await md5_client.download_file()
+            stored_hash = (await md5_downloader.readall()).decode('utf-8').strip()
+        except Exception:
+            stored_hash = None
+    
+        # Compare existing and stored hash
+        if stored_hash and stored_hash == existing_hash:
+            logger.info(f"Skipping {path}, no changes detected.")
+            return True
+    
+        return False
+    
+    
+    async def store_md5(self, path: str, filesystem_client):
+        """
+        Compute the MD5 hash of the file at `path` and store it in a .md5 file in the data lake.
+        """
+        hash_path = f"{path}.md5"
+        md5_client = filesystem_client.get_file_client(hash_path)
+    
+        # Compute the MD5 hash
+        async with filesystem_client.get_file_client(path) as file_client:
+            try:
+                downloader = await file_client.download_file()
+                content = await downloader.readall()
+                existing_hash = hashlib.md5(content).hexdigest()
+            except Exception as e:
+                logger.error(f"Error downloading file for hash storage: {e}")
+                return
+    
+        # Store the MD5 hash
+        try:
+            await md5_client.upload_data(existing_hash, overwrite=True)
+            logger.info(f"MD5 hash stored for {path}")
+        except Exception as e:
+            logger.error(f"Error storing MD5 hash for {path}: {e}")
