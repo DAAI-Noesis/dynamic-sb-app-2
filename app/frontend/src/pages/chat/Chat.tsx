@@ -91,20 +91,42 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
         UserFeedback: feedback,
       };
 
-      const jsonData = JSON.stringify(data)
+      console.log("data:");
+      console.log(data);
+
+
+      // const jsonData = JSON.stringify(data)
+
+      // console.log("jsonData:");
+      // console.log(jsonData);
 
       try {
         // const response = await axios.post("http://localhost:7071/api/Feedback_insert", jsonData);
         // console.log(response.data);
 
-        // const response = await axios.post("http://localhost:50505/feedback_insert", jsonData, {
+        // const response = await axios.post(, jsonData, {
         //   headers: {
         //     'Content-Type': 'application/json',
         //   },
         // });
         // console.log(response.data);
-        
-        feedbackApi(jsonData)
+
+        // feedbackApi(data)
+
+        // const response = await feedbackApi(jsonData);
+        const response = await feedbackApi(data);
+        if (!response.ok) {
+            console.error('Error response from server:', response.status, await response.text());
+        } else {
+            const responseBody = await response.json();
+            console.log(responseBody);
+        }
+        // const responseBody = await response.json();
+        // console.log(responseBody);
+
+        // if (!response.ok) {
+        //   console.error('Error response from server:', responseBody);
+        // }
       } catch (error) {
         console.error('Error sending feedback:', error);
       }

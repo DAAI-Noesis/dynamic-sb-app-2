@@ -93,7 +93,6 @@ from prepdocslib.filestrategy import UploadUserFileStrategy
 from prepdocslib.listfilestrategy import File
 from quart import Quart, Blueprint
 from azure.core.credentials import AzureNamedKeyCredential
-import logging
 from prepdocs import setup_list_file_strategy
 from azure.identity.aio import DefaultAzureCredential
 from azure.core.credentials_async import AsyncTokenCredential
@@ -707,6 +706,9 @@ async def feedback_insert():
     
     try:
         req_body = await request.get_json()
+        if not req_body:
+            raise ValueError("Empty or invalid JSON data")
+        logging.info(f'Received request body: {req_body}')
         
         with engine.connect() as connection:
             # Begin a transaction
@@ -735,7 +737,8 @@ async def feedback_insert():
                 return jsonify(response_content), 400
             
     except Exception as e:
-        logging.error(f"Error processing request: {e}")
+        logging.error(f"Error parsing JSON: {e}", exc_info=True)
+        # logging.error(f"Error processing request: {e}")
         response_content = {
             "body": "Error",
             "status_code": 400

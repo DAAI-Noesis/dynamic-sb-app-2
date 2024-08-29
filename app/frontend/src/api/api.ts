@@ -142,16 +142,30 @@ export async function listFoldersApi(idToken: string | undefined): Promise<strin
   }
 }
 
-export async function feedbackApi(
-  answer: string
-): Promise<Response> {
-  return await fetch(`${BACKEND_URI}/feedback_insert`, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json', // Set the content type to JSON
-    },
-    body: answer
-  });
+// // export async function feedbackApi(answer: string): Promise<Response> {
+// export async function feedbackApi(data: { UserQuestion: string; BotMessage: string; UserFeedback: boolean}): Promise<Response> {
+  
+//   console.log("data:");
+//   console.log(data);
+//   return await fetch(`${BACKEND_URI}/feedback_insert`, {
+//     method: "POST",
+//     headers: {
+//       'Content-Type': 'application/json', // Set the content type to JSON
+//     },
+//     body: JSON.stringify(data)
+//   });
+// }
+
+export async function feedbackApi(request: { UserQuestion: string; BotMessage: string; UserFeedback: boolean }): Promise<Response> {
+    console.log("request:");
+    console.log(request);
+    return await fetch(`${BACKEND_URI}/feedback_insert`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json', // Set the content type to JSON
+      },
+      body: JSON.stringify(request)
+    });
 }
 
 

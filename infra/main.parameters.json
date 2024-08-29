@@ -256,6 +256,9 @@
     },
     "azure_adls_gen2_storage_account": {
       "value": "${AZURE_ADLS_GEN2_STORAGE_ACCOUNT}"
+    },
+    "sqlalchemy_database_url": {
+      "value": "${SQLALCHEMY_DATABASE_URL}"
     }
   }
 }

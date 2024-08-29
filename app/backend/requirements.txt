@@ -346,6 +346,9 @@ pymupdf==1.24.4
     # via -r requirements.in
 pymupdfb==1.24.3
     # via pymupdf
+
+pyodbc
+
 pypdf==4.2.0
     # via -r requirements.in
 python-dateutil==2.9.0.post0

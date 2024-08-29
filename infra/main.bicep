@@ -11,6 +11,7 @@ param location string
 param azure_adls_gen2_filesystem string // Set in main.parameters.json
 param azure_adls_gen2_filesystem_path string // Set in main.parameters.json
 param azure_adls_gen2_storage_account string // Set in main.parameters.json
+param sqlalchemy_database_url string 
 param appServicePlanName string = '' // Set in main.parameters.json
 param backendServiceName string = '' // Set in main.parameters.json
 param resourceGroupName string = '' // Set in main.parameters.json
@@ -293,6 +294,7 @@ module backend 'core/host/appservice.bicep' = {
       AZURE_ADLS_GEN2_FILESYSTEM: azure_adls_gen2_filesystem
       AZURE_ADLS_GEN2_FILESYSTEM_PATH: azure_adls_gen2_filesystem_path
       AZURE_ADLS_GEN2_STORAGE_ACCOUNT: azure_adls_gen2_storage_account
+      SQLALCHEMY_DATABASE_URL: sqlalchemy_database_url
       AZURE_STORAGE_ACCOUNT: storage.outputs.name
       AZURE_STORAGE_CONTAINER: storageContainerName
       AZURE_SEARCH_INDEX: searchIndexName
@@ -821,6 +823,7 @@ output AZURE_SEARCH_SERVICE_ASSIGNED_USERID string = searchService.outputs.princ
 output AZURE_ADLS_GEN2_FILESYSTEM string = azure_adls_gen2_filesystem
 output AZURE_ADLS_GEN2_FILESYSTEM_PATH string = azure_adls_gen2_filesystem_path
 output AZURE_ADLS_GEN2_STORAGE_ACCOUNT string = azure_adls_gen2_storage_account
+output SQLALCHEMY_DATABASE_URL string = sqlalchemy_database_url 
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
 output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
