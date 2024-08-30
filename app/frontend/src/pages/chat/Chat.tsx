@@ -60,7 +60,7 @@ import { useMsal } from "@azure/msal-react";
 import { TokenClaimsDisplay } from "../../components/TokenClaimsDisplay";
 import { GPT4VSettings } from "../../components/GPT4VSettings";
 import { TYPES_OF_CHAT_CONFIG, USE_CASES } from "../../helpers/constants";
-import PrintButton from "../../components/PrintButton/PrintButton";
+// import PrintButton from "../../components/PrintButton/PrintButton";
 
 type ChatProps = {
   activeUseCase: USE_CASES; // Change from USE_CASES to string
@@ -113,10 +113,12 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
 
         // feedbackApi(data)
 
+        // await feedbackApi(data);
+
         // const response = await feedbackApi(jsonData);
         const response = await feedbackApi(data);
         if (!response.ok) {
-            console.error('Error response from server:', response.status, await response.text());
+            console.error('Error response from server NEW:', response.status, await response.text());
         } else {
             const responseBody = await response.json();
             console.log(responseBody);
@@ -128,7 +130,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
         //   console.error('Error response from server:', responseBody);
         // }
       } catch (error) {
-        console.error('Error sending feedback:', error);
+        console.error('Error sending feedback NEW:', error);
       }
     };
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -594,10 +596,10 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             className={styles.commandButton}
             onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
           />
-          <PrintButton
+          {/* <PrintButton
             chatRef={chatRef}
             disabled={!lastQuestionRef.current || isLoading}
-          />
+          /> */}
         </div>
         <div className={styles.chatRoot}>
           <div
@@ -608,7 +610,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
                 <h1 className={styles.chatEmptyStateTitle}>
-                  Tópicos Super Bock AHhhH
+                  Tópicos Super Bock
                 </h1>
                 <h2 className={styles.chatEmptyStateSubtitle}>
                 Faz uma pergunta ou adiciona um exemplo

@@ -701,14 +701,17 @@ async def list_uploaded(auth_claims: dict[str, Any]):
 #         return error_response(error, "/list_folders")
 
 @bp.route("/feedback_insert", methods=["POST"])
+# @authenticated(config_auth_client=CONFIG_AUTH_CLIENT_T1)
 async def feedback_insert():
-    logging.info('Processing a request to insert feedback.')
+    logging.info('Processing a request to insert feedback NEW.')
     
     try:
+        # data = await request.data
+        # logging.info(f'Request data raw: {data}')
         req_body = await request.get_json()
         if not req_body:
-            raise ValueError("Empty or invalid JSON data")
-        logging.info(f'Received request body: {req_body}')
+            raise ValueError("Empty or invalid JSON data NEW")
+        logging.info(f'Received request body NEW: {req_body}')
         
         with engine.connect() as connection:
             # Begin a transaction
@@ -716,12 +719,13 @@ async def feedback_insert():
             
             try:
                 # Insert records into the Feedback table
+                logging.info(f'Inserting into Feedback table: {req_body}')
                 stmt = insert(Feedback)
                 connection.execute(stmt, req_body)
                 transaction.commit()
                 
                 response_content = {
-                    "body": "Data processed and inserted successfully",
+                    "body": "Data processed and inserted successfully NEW",
                     "status_code": 201
                 }
                 return jsonify(response_content), 201
@@ -731,7 +735,7 @@ async def feedback_insert():
                 transaction.rollback()
                 logging.error(f"Error inserting feedback: {e}")
                 response_content = {
-                    "body": "Error",
+                    "body": "Error NEW",
                     "status_code": 400
                 }
                 return jsonify(response_content), 400

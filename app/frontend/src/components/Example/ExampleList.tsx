@@ -5,14 +5,14 @@ import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES = {
   [USE_CASES.THEME_1]: [
-    "Os infoobjects que são específicos de determinada aplicação devem ficar inseridos dentro ou fora da respetiva Infoarea?",
+    "Os infoobjects devem ficar inseridos dentro ou fora da respetiva Infoarea?",
     "Quais são as considerações base?",
     "Quais são os modelos a implementar?",
   ],
   [USE_CASES.THEME_2]: [
-    "",
-    "",
-    ""
+    "Que manuais existem?",
+    "O que sabes sobre Análise de Desvios de Produção em Quantidade?",
+    "O que sabes sobre Diário de Doctºs por Conta de GL?"
   ],
   [USE_CASES.THEME_3]: [
     "",
@@ -20,9 +20,9 @@ const DEFAULT_EXAMPLES = {
     ""
   ],
   [USE_CASES.THEME_4]: [
-    "",
-    "",
-    ""
+    "Resume a gravação.",
+    "O que foi feito para a avaliação do contrato?",
+    "Lista detalhes sobre o contrato."
   ],
   [USE_CASES.THEME_5]: [
     "",

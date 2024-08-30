@@ -157,7 +157,7 @@ export async function listFoldersApi(idToken: string | undefined): Promise<strin
 // }
 
 export async function feedbackApi(request: { UserQuestion: string; BotMessage: string; UserFeedback: boolean }): Promise<Response> {
-    console.log("request:");
+    console.log("requestNEW:");
     console.log(request);
     return await fetch(`${BACKEND_URI}/feedback_insert`, {
       method: "POST",

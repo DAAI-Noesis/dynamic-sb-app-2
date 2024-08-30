@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+/* Reset margin and padding for html and body */
 html,
 body {
   height: 100%;
@@ -9,31 +10,58 @@ body {
   padding: 0;
 }
 
+/* Set a background color for the entire page */
 html {
   background: #f2f2f2;
+}
 
-  font-family: Klavika;
+/* Define the Klavika font-face for different weights and styles */
+@font-face {
+  font-family: 'Klavika';
+  src: url('fonts/Klavika-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Klavika';
+  src: url('fonts/Klavika-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Klavika';
+  src: url('fonts/Klavika-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Klavika';
+  src: url('fonts/Klavika-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Apply the Klavika font to the entire page */
+body {
+  font-family: 'Klavika', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1 {
-  font-family: Klavika;
+/* Apply Klavika font to header elements */
+h1, h2, h3, h4, h5 {
+  font-family: 'Klavika', sans-serif;
 }
-h2{
-  font-family: Klavika;
-}
-h3{
-  font-family: Klavika;
-}
-h4{
-  font-family: Klavika;
-}
+
+/* Make h5 bold */
 h5 {
-  font-family: Klavika;
   font-weight: bold;
 }
 
+/* Ensure the root element takes full height */
 #root {
   height: 100%;
 }
