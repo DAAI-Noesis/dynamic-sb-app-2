@@ -3,6 +3,8 @@ const BACKEND_URI = "";
 import { ChatAppResponse, ChatAppResponseOrError, ChatAppRequest, Config, SimpleAPIResponse } from "./models";
 
 import { useLogin, appServicesToken } from "../authConfig";
+import { THEME_MAPPINGS } from "../components/SideMenu";
+
 
 export function getHeaders(
   idToken: string | undefined
@@ -197,9 +199,12 @@ export async function feedbackApi(request: { UserQuestion: string; BotMessage: s
 // }
 
 
-export function getCitationFilePath(citation: string): string {
-  return `${BACKEND_URI}/content/${citation}`;
+export function getCitationFilePath(citation: string, folder: string): string {
+  return `${BACKEND_URI}/content/${folder}/${citation}`;
 }
+
+
+
 
 export async function uploadFileApi(request: FormData, idToken: string): Promise<SimpleAPIResponse> {
     const response = await fetch("/upload", {

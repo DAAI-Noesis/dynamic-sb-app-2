@@ -7,7 +7,8 @@
 .header {
   display: flex;
   /* background-color: #222222; */
-  background-color: #ab2328;
+  /* background-color: #ab2328; */
+  background-color: #ffffff;
   color: #f2f2f2;
   padding: 10px;
 }
@@ -81,3 +82,11 @@
   background-size: COVER;
   overflow-y: hidden;
 }
+
+.redBar {
+  width: 100%;
+  height: 60px; /* A altura da barra, ajuste conforme necessário */
+  background-color: #ab2328;
+  margin-top: 10px; /* Espaçamento entre o cabeçalho e a barra */
+}
+

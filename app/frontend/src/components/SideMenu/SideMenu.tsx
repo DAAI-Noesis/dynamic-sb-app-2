@@ -381,7 +381,7 @@ type SideMenuProps = {
   isLoading: boolean;
 };
 
-const THEME_MAPPINGS: USE_CASES[] = [
+export const THEME_MAPPINGS: USE_CASES[] = [
   USE_CASES.THEME_1,
   USE_CASES.THEME_2,
   USE_CASES.THEME_3,
@@ -428,13 +428,15 @@ export const SideMenu = ({
   const fetchFolders = useCallback(async (idToken: string | undefined) => {
     try {
       const folders = await listFoldersApi(idToken);
+      // added this line
+      setFolders(folders || []);
 
-      if (!folders || folders.length === 0) {
-        setFolders([]);
-        return;
-      }
+      // if (!folders || folders.length === 0) {
+      //   setFolders([]);
+      //   return;
+      // }
 
-      setFolders(folders);
+      // setFolders(folders);
     } catch (error) {
       console.error('Error in fetchFolders:', error);
       setError(error instanceof Error ? error.message : 'Error fetching folders');
@@ -496,12 +498,15 @@ export const SideMenu = ({
   }, [getUseCaseKeyFromIndex, isLoading, onCaseSelect]);
 
   const debouncedHandleClick = useMemo(() => debounce((index: number) => handleClick(index), 0), [handleClick]);
-
+  // added this 2 lines
+  const selectedFolderIndex = THEME_MAPPINGS.indexOf(activeUseCase);
+  const selectedFolder = selectedFolderIndex !== -1 ? folders[selectedFolderIndex] : null;
+  
   return (
     <aside className={styles.sideMenuContainer}>
       <div>
         <div className={styles.sideMenuHeader}>
-          <h2>Tópicos</h2>
+          <h2>Tópicos de conversa</h2>
         </div>
         <ul className={styles.chatList}>
           {folders.length > 0 ? (
@@ -511,18 +516,31 @@ export const SideMenu = ({
                 className={`${styles.menuOption} ${activeUseCase === getUseCaseKeyFromIndex(index) ? styles.activeOption : ""} ${isLoading ? styles.disabledOption : ""}`}
                 onClick={() => debouncedHandleClick(index)}
               >
-                {folder}
+                 <strong>{folder}</strong> 
+                <p style={{ fontSize: '12px', color: 'gray' }}> {/* Texto menor e cinzento para "Descrição do Tópico" */}
+                Descrição do Tópico
+              </p>
               </li>
             ))
           ) : (
-            <li>No folders available</li>
+            <li>A carregar Tópicos...</li>
           )}
         </ul>
+        {/* <ul className={styles.chatList}>
+          {selectedFolder ? (
+            <li
+              key={selectedFolder}
+              className={`${styles.menuOption} ${styles.activeOption} ${isLoading ? styles.disabledOption : ""}`}
+              onClick={() => debouncedHandleClick(selectedFolderIndex)}
+            >
+              {selectedFolder}
+            </li>
+          ) : (
+            <li>No folders available</li>
+          )}
+        </ul> */}
         {error && <p className={styles.error}>{error}</p>}
       </div>
-      <p className={styles.caseDescription}>
-        {USE_CASES[activeUseCase]}
-      </p>
     </aside>
   );
 };

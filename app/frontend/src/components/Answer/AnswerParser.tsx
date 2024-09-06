@@ -6,7 +6,7 @@ type HtmlParsedAnswer = {
     citations: string[];
 };
 
-export function parseAnswerToHtml(answer: string, isStreaming: boolean, onCitationClicked: (citationFilePath: string) => void): HtmlParsedAnswer {
+export function parseAnswerToHtml(answer: string, isStreaming: boolean, onCitationClicked: (citationFilePath: string) => void, selectedFolder: string | null): HtmlParsedAnswer {
     const citations: string[] = [];
 
     // trim any whitespace from the end of the answer after removing follow-up questions
@@ -41,7 +41,7 @@ export function parseAnswerToHtml(answer: string, isStreaming: boolean, onCitati
                 citationIndex = citations.length;
             }
 
-            const path = getCitationFilePath(part);
+            const path = selectedFolder ? getCitationFilePath(part, selectedFolder) : '#';
 
             return renderToStaticMarkup(
                 <a className="supContainer" title={part} onClick={() => onCitationClicked(path)}>

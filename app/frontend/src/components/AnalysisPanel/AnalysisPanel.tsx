@@ -104,6 +104,7 @@ export const AnalysisPanel = ({
           setDownloadProgress(percentCompleted);
         }
       };
+      
 
       // Get hash from the URL as it may contain #page=N
       // which helps browser PDF renderer jump to correct page N
@@ -115,6 +116,7 @@ export const AnalysisPanel = ({
       console.log("lastPartOfCitationUrl:", lastPartOfCitationUrl);
 
       setFileFormat(lastPartOfCitationUrl);
+      console.log("Active Citationnnnnnnnnnnnnn:",activeCitation);
 
       const response = await axios.get(activeCitation, config);
       console.log("response:", response);

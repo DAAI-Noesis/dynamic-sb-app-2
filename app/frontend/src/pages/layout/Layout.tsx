@@ -78,7 +78,8 @@ const Layout = React.forwardRef<HTMLDivElement>((props, ref) => {
           {useLogin && <LoginButton />}
         </div>
       </header>
-
+      {/* Adicionar a barra vermelha aqui */}
+      <div className={styles.redBar}></div>
       <div className={styles.bodyContainer}>
         <SideMenu
           activeUseCase={activeUseCase}

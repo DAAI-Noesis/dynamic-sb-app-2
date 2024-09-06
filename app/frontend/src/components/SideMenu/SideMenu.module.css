@@ -2,7 +2,7 @@
   width: 250px;
   min-width: 250px;
   height: 100%;
-  background-color: #e7e7e7;
+  background-color: #f8f8f8;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 
@@ -14,9 +14,9 @@
 .sideMenuHeader {
   /* padding: 20px; */
   padding: 10px;
-  background-color: #e7e7e7;
-  border-bottom: 1px solid #e7e7e7;
-  color: #ab2328;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #f8f8f8;
+  color: #080808;
 }
 
 .chatList {
@@ -27,17 +27,17 @@
 
 .menuOption {
   padding: 15px 20px;
-  border-bottom: 1px solid #e7e7e7;
+  border-bottom: 1px solid #b9b6b6;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .menuOption:hover {
-  background-color: #e7e7e7;
+  background-color: #f0cbcc;
 }
 
 .activeOption {
-  background-color: #686565;
+  background-color: #f0cbcc;
 }
 
 .caseDescription {

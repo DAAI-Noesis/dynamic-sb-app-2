@@ -47,7 +47,7 @@ import {
   AnalysisPanel,
   AnalysisPanelTabs
 } from "../../components/AnalysisPanel";
-import { SettingsButton } from "../../components/SettingsButton";
+// import { SettingsButton } from "../../components/SettingsButton";
 import { ClearChatButton } from "../../components/ClearChatButton";
 import {
   useLogin,
@@ -60,7 +60,10 @@ import { useMsal } from "@azure/msal-react";
 import { TokenClaimsDisplay } from "../../components/TokenClaimsDisplay";
 import { GPT4VSettings } from "../../components/GPT4VSettings";
 import { TYPES_OF_CHAT_CONFIG, USE_CASES } from "../../helpers/constants";
-// import PrintButton from "../../components/PrintButton/PrintButton";
+import { THEME_MAPPINGS } from "../../components/SideMenu";
+import { listFoldersApi } from "../../api"; // Assuming this is the correct path to your API functions
+import { useMemo } from "react";
+
 
 type ChatProps = {
   activeUseCase: USE_CASES; // Change from USE_CASES to string
@@ -583,6 +586,34 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       setIsAnalysisPanelExpanded(!isAnalysisPanelExpanded);
     };
 
+
+    const [folders, setFolders] = useState<string[]>([]);
+
+    const fetchFolders = useCallback(async () => {
+      try {
+        const token = client ? await getToken(client) : undefined;
+        const folders = await listFoldersApi(token);
+  
+        if (folders && folders.length > 0) {
+          setFolders(folders);
+        } else {
+          setFolders([]);
+        }
+      } catch (error) {
+        console.error('Error fetching folders:', error);
+        setError(error instanceof Error ? error.message : 'Error fetching folders');
+      }
+    }, [client]);
+  
+    useEffect(() => {
+      fetchFolders();
+    }, [fetchFolders]);
+
+    const selectedFolder = useMemo(() => {
+      const useCaseIndex = THEME_MAPPINGS.indexOf(activeUseCase);
+      return useCaseIndex !== -1 ? folders[useCaseIndex] : null;
+    }, [folders, activeUseCase]);
+
     return (
       <div className={styles.container}>
         <div className={styles.commandsContainer}>
@@ -592,14 +623,6 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             disabled={!lastQuestionRef.current || isLoading}
           />
            {showUserUpload && <UploadFile className={styles.commandButton} disabled={!isLoggedIn(client)} />}
-          <SettingsButton
-            className={styles.commandButton}
-            onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
-          />
-          {/* <PrintButton
-            chatRef={chatRef}
-            disabled={!lastQuestionRef.current || isLoading}
-          /> */}
         </div>
         <div className={styles.chatRoot}>
           <div
@@ -609,12 +632,28 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
           >
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
-                <h1 className={styles.chatEmptyStateTitle}>
-                  Tópicos Super Bock
-                </h1>
-                <h2 className={styles.chatEmptyStateSubtitle}>
+                <ul>
+              {folders.length > 0 ? (
+                <>
+                  {/* Find the selected folder based on activeUseCase */}
+                  {folders.map((folder, index) => {
+                    const isSelected = activeUseCase === THEME_MAPPINGS[index];
+                    return (
+                      isSelected && (
+                        <h2 key={index} style={{ color: '#080808' }}>
+                          Tópico {folder}
+                        </h2>
+                      )
+                    );
+                  })}
+                </>
+              ) : (
+                <li>A carregar o tópico...</li>
+              )}
+            </ul>
+                {/* <h2 className={styles.chatEmptyStateSubtitle}>
                 Faz uma pergunta ou adiciona um exemplo
-                </h2>
+                </h2> */}
                 <ExampleList
                   onExampleClicked={onExampleClicked}
                   useGPT4V={useGPT4V}
@@ -637,23 +676,13 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                           answer={streamedAnswer[1]}
                           isSelected={false}
                           onCitationClicked={c => onShowCitation(c, index)}
-                          onThoughtProcessClicked={() =>
-                            onToggleTab(
-                              AnalysisPanelTabs.ThoughtProcessTab,
-                              index
-                            )
-                          }
-                          onSupportingContentClicked={() =>
-                            onToggleTab(
-                              AnalysisPanelTabs.SupportingContentTab,
-                              index
-                            )
-                          }
                           onFollowupQuestionClicked={q => makeApiRequest(q)}
                           showFollowupQuestions={
                             useSuggestFollowupQuestions &&
                             answers.length - 1 === index
                           }
+                          activeUseCase={activeUseCase}
+                          selectedFolder={selectedFolder}
                         />
                       </div>
                     </div>
@@ -675,23 +704,13 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                             activeAnalysisPanelTab !== null
                           }
                           onCitationClicked={c => onShowCitation(c, index)}
-                          onThoughtProcessClicked={() =>
-                            onToggleTab(
-                              AnalysisPanelTabs.ThoughtProcessTab,
-                              index
-                            )
-                          }
-                          onSupportingContentClicked={() =>
-                            onToggleTab(
-                              AnalysisPanelTabs.SupportingContentTab,
-                              index
-                            )
-                          }
                           onFollowupQuestionClicked={q => makeApiRequest(q)}
                           showFollowupQuestions={
                             useSuggestFollowupQuestions &&
                             answers.length - 1 === index
                           }
+                          activeUseCase={activeUseCase}
+                          selectedFolder={selectedFolder}
                         />
                         <div>
                           <button onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}>
@@ -730,7 +749,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             <div className={styles.chatInput}>
               <QuestionInput
                 clearOnSend
-                placeholder="Type a new question."
+                placeholder="Escreva uma questão."
                 disabled={isLoading}
                 onSend={question => makeApiRequest(question)}
               />

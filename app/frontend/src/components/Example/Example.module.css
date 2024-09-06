@@ -9,8 +9,8 @@
 
 .example {
   word-break: break-word;
-  background: #ab2328;
-  color: white;
+  background: #f8f8f8;
+  color: rgb(8, 8, 8);
   border-radius: 8px;
 
   display: flex;
