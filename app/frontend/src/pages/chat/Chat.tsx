@@ -66,10 +66,12 @@ import { useMemo } from "react";
 
 
 type ChatProps = {
-  activeUseCase: USE_CASES; // Change from USE_CASES to string
+  // activeUseCase: USE_CASES; 
+  activeUseCase: USE_CASES;
   isLoading: boolean;
   hasUserScrolledUp: boolean;
   setIsLoading: (loading: boolean) => void;
+  isChatVisible: boolean;// Add this prop
 };
 
 export interface ChatHandles {
@@ -78,7 +80,7 @@ export interface ChatHandles {
 
 const Chat = forwardRef<ChatHandles, ChatProps>(
   (
-    { activeUseCase, isLoading, hasUserScrolledUp, setIsLoading }: ChatProps,
+    { activeUseCase, isLoading, hasUserScrolledUp, setIsLoading, isChatVisible }: ChatProps,
     ref
   ) => {
     const [userFeedback, setUserFeedback] = useState<boolean | null>(null);
@@ -608,6 +610,21 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     useEffect(() => {
       fetchFolders();
     }, [fetchFolders]);
+    
+    
+    useEffect(() => {
+      if (!isChatVisible) {
+        setAnswers([]);
+        setStreamedAnswers([]);
+        setError(null);
+      }
+    }, [isChatVisible]);
+    
+  
+
+
+
+
 
     const selectedFolder = useMemo(() => {
       const useCaseIndex = THEME_MAPPINGS.indexOf(activeUseCase);
@@ -616,7 +633,9 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
 
     return (
       <div className={styles.container}>
-        <div className={styles.commandsContainer}>
+         {isChatVisible && ( // Conditionally render the chat interface
+          <div className={styles.chatRoot}>
+            <div className={styles.commandsContainer}>
           <ClearChatButton
             className={styles.commandButton}
             onClick={clearChat}
@@ -624,12 +643,26 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
           />
            {showUserUpload && <UploadFile className={styles.commandButton} disabled={!isLoggedIn(client)} />}
         </div>
-        <div className={styles.chatRoot}>
           <div
             className={`${styles.chatContainer} ${
               isAnalysisPanelExpanded && styles.hideChat
             }`}
           >
+            {/* Display message if no topic has been clicked yet */}
+            {!activeUseCase ? (
+              <div className={styles.chatEmptyState}>
+                <div className={styles.selectTopicMessage}>
+                  Please select a topic
+                </div>
+              </div>
+            ) : (
+              <>
+            
+
+
+
+
+
             {!lastQuestionRef.current ? (
               <div className={styles.chatEmptyState}>
                 <ul>
@@ -659,6 +692,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                   useGPT4V={useGPT4V}
                   activeUseCase={activeUseCase}
                 />
+                
               </div>
             ) : (
               <div className={styles.chatMessageStream} ref={chatRef}>
@@ -754,7 +788,10 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                 onSend={question => makeApiRequest(question)}
               />
             </div>
+            </>
+            )}
           </div>
+          
 
           {answers.length > 0 && activeAnalysisPanelTab && (
             <AnalysisPanel
@@ -889,6 +926,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             {useLogin && <TokenClaimsDisplay />}
           </Panel>
         </div>
+         )}
       </div>
     );
   }
