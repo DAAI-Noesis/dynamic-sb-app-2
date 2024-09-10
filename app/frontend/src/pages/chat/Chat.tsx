@@ -67,7 +67,7 @@ import { useMemo } from "react";
 
 type ChatProps = {
   // activeUseCase: USE_CASES; 
-  activeUseCase: USE_CASES;
+  activeUseCase: USE_CASES | null;
   isLoading: boolean;
   hasUserScrolledUp: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -626,10 +626,19 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
 
 
 
+    // const selectedFolder = useMemo(() => {
+    //   const useCaseIndex = THEME_MAPPINGS.indexOf(activeUseCase);
+    //   return useCaseIndex !== -1 ? folders[useCaseIndex] : null;
+    // }, [folders, activeUseCase]);
     const selectedFolder = useMemo(() => {
+      if (activeUseCase === null) {
+        return null; // Handle the case where no use case is selected
+      }
+      
       const useCaseIndex = THEME_MAPPINGS.indexOf(activeUseCase);
       return useCaseIndex !== -1 ? folders[useCaseIndex] : null;
     }, [folders, activeUseCase]);
+    
 
     return (
       <div className={styles.container}>
@@ -649,12 +658,12 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
             }`}
           >
             {/* Display message if no topic has been clicked yet */}
-            {!activeUseCase ? (
-              <div className={styles.chatEmptyState}>
-                <div className={styles.selectTopicMessage}>
-                  Please select a topic
-                </div>
-              </div>
+            {activeUseCase == null ? (
+               <div className={styles.chatEmptyState}>
+               <div className={styles.selectTopicMessage}>
+                 Please select a topic
+               </div>
+             </div>
             ) : (
               <>
             

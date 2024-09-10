@@ -205,7 +205,7 @@ import { useLogin, getToken } from "../../authConfig";
 import { getHeaders } from '../../api';
 
 type SideMenuProps = {
-  activeUseCase: USE_CASES;
+  activeUseCase: USE_CASES | null;
   onCaseSelect: (chatId: USE_CASES) => void;
   isLoading: boolean;
   setIsChatVisible: (isVisible: boolean) => void; // Function to set chat visibility
