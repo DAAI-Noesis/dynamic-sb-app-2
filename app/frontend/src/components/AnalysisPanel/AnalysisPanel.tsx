@@ -14,7 +14,7 @@ import { ChatAppResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
 import { ThoughtProcess } from "./ThoughtProcess";
 import { getHeaders } from "../../api";
-import { useLogin, getToken } from "../../authConfig";
+import { useLogin, getToken , getTokenPdfs} from "../../authConfig";
 import { LoadingBar } from "../LoadingBar";
 
 interface Props {
@@ -66,7 +66,7 @@ export const AnalysisPanel = ({
   const fetchCitation = async () => {
     localStorage.setItem(`fetched_${activeCitation}`, "true");
 
-    const token = client ? await getToken(client) : undefined;
+    const token = client ? await getTokenPdfs(client) : undefined;
 
     if (activeCitation) {
       // const filename = activeCitation.substring(
@@ -272,3 +272,4 @@ export const AnalysisPanel = ({
     </div>
   );
 };
+

@@ -150,3 +150,23 @@ export const getToken = (client: IPublicClientApplication): Promise<string | und
             return undefined;
         });
 };
+
+
+//getToken for load pdfs
+
+export const getTokenPdfs = (client: IPublicClientApplication): Promise<string | undefined> => {
+    // if (appServicesToken) {
+    //     return Promise.resolve(appServicesToken.access_token);
+    // }
+
+    return client
+        .acquireTokenSilent({
+            ...tokenRequest,
+            redirectUri: getRedirectUri()
+        })
+        .then(r => r.accessToken)
+        .catch(error => {
+            console.log(error);
+            return undefined;
+        });
+};

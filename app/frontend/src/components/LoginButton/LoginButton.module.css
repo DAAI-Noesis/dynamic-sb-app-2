@@ -1,7 +1,18 @@
 .loginButton {
     border-radius: 5px;
-    padding: 30px 30px;
+    padding: 20px 40px; /* Adjust padding */
     font-weight: 100;
-    right: -1200px;
     color: #ab2328;
+
+    /* Positioning the button */
+    position: fixed; /* Makes the button fixed in place */
+    top: 10px; /* Distance from the top of the screen */
+    right: 10px; /* Distance from the right side of the screen */
+
+    /* Optional: For responsiveness */
+    @media (max-width: 768px) {
+        padding: 15px 30px; /* Adjust padding for smaller screens */
+        top: 5px; /* Adjust top for smaller screens */
+        right: 5px; /* Adjust right for smaller screens */
+    }
 }

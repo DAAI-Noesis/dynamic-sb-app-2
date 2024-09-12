@@ -231,6 +231,7 @@ export const SideMenu = ({
   const [isTopicSelected, setIsTopicSelected] = useState<boolean>(false);
   const cacheRef = useRef<Record<string, any>>({});
   const client = useLogin ? useMsal().instance : undefined;
+  
 
   const fetchFolders = useCallback(async (idToken: string | undefined) => {
     try {

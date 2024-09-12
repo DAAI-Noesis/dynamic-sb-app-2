@@ -128,20 +128,65 @@
 .hideChat {
   display: none;
 }
-.selectTopicMessage {
+.chatEmptyState {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: 100%; /* Make it take the full height of the chat container */
   text-align: center;
-  color: #555; /* You can change this to your preferred color */
-  font-size: 18px; /* Adjust the size as needed */
-  font-weight: 500; /* Bold or medium weight for better readability */
-  background-color: #1e882c; /* A light background to distinguish it from the rest of the UI */
-  padding: 20px;
-  border-radius: 8px; /* Adds rounded corners */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+  color: #a32727;
+  background-color: #ffffff; /* Set a color that contrasts well with the background */
 }
+
+.selectTopicMessage {
+  font-size: 1.2rem; /* Adjust the font size as necessary */
+  padding: 20px; /* Add some padding to make it look better */
+}
+
+.topRight {
+  position: absolute; /* Makes it possible to position this element relative to the parent */
+  top: 7px; /* Adjust as necessary for spacing */
+  right: 10px; /* Adjust as necessary for spacing */
+  z-index: 100; /* Ensures it is above other elements */
+}
+
+
+.feedback {
+  background-color: rgba(219, 219, 219, 0.637); /* Red background */
+  color: white; /* White text color */
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer; /* Cursor changes to pointer on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+.feedback:hover {
+  background-color: #ab2328;/* Darker red on hover */
+  transform: scale(1.05); /* Slight scale-up effect on hover */
+}
+
+.selected {
+  background-color: #ab2328 !important; /* Green background when selected */
+}
+
+.icon-selected {
+  color: #ffffff !important; /* White icon color when selected */
+}
+
+.feedback i {
+  margin-right: 5px;
+}
+
+.feedback:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(50, 50, 50, 0.5); /* Subtle shadow on focus for accessibility */
+}
+
+
+
+
+
 
 
 /* Safari */

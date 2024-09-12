@@ -88,6 +88,7 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
 
     // Function to handle feedback submission
     const handleFeedback = async (feedback: boolean, question: string, botMessage: string) => {
+      console.log("Button clicked, feedback:", feedback); // Debug line
       setUserFeedback(feedback);
 
       const data = {
@@ -756,12 +757,46 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
                           selectedFolder={selectedFolder}
                         />
                         <div>
-                          <button onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}>
-                            👍
-                          </button>
-                          <button onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}>
-                            👎
-                          </button>
+                        {/* <button
+                          type="button"
+                          className={`${styles.feedback}`}
+                          onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}
+                        >
+                          ola
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`${styles.feedbackselected}`}
+                          onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}
+                        >
+                          ola
+                        </button> */}
+
+                        <button
+                          onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}
+                          className={`${styles.feedback} ${userFeedback === true ? styles.selected : ''}`}
+                          title="Thumbs up - Positive Feedback"
+                        >
+                          <i className={`fa-sharp fa-solid fa-thumbs-up ${userFeedback === true ? styles.iconSelected : ''}`}></i>
+                        </button>
+
+                        <button
+                          onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}
+                          className={`${styles.feedback} ${userFeedback === false ? styles.selected : ''}`}
+                          title="Thumbs down - Negative Feedback"
+                        >
+                          <i className={`fa-regular fa-thumbs-down ${userFeedback === false ? styles.iconSelected : ''}`}></i>
+                        </button>
+
+
+
+
+
+
+
+
+
                         </div>
                       </div>
                     </div>

@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "lodash.debounce": "^4.0.8"
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "i18next": "^23.15.1",
+    "lodash.debounce": "^4.0.8",
+    "markdown-viewer": "^1.0.1",
+    "react-i18next": "^15.0.1"
   }
 }

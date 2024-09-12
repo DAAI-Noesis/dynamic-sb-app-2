@@ -1,7 +1,19 @@
-.container {
+/* .container {
     display: flex;
     align-items: center;
     gap: 6px;
     cursor: pointer;
     color:#ab2328;
+} */
+.container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #ab2328;
+
+    /* Estilos para posicionar o botão no canto superior direito, mais para baixo */
+    position: absolute;
+    top: 155px; /* Aumentei o valor para mover o botão mais para baixo */
+    right: 10px;
 }
