@@ -158,7 +158,7 @@ export const getTokenPdfs = (client: IPublicClientApplication): Promise<string |
     // if (appServicesToken) {
     //     return Promise.resolve(appServicesToken.access_token);
     // }
-
+    
     return client
         .acquireTokenSilent({
             ...tokenRequest,

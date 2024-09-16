@@ -190,12 +190,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { USE_CASES } from "../../helpers/constants";
 import styles from "./SideMenu.module.css";
 import {
-  askApi,
   chatApi,
-  chat2Api,
-  chat3Api,
-  chat4Api,
-  chat5Api,
   listFoldersApi
 } from "../../api";
 import { ChatAppRequest } from "../../api/models";
@@ -231,7 +226,6 @@ export const SideMenu = ({
   const [isTopicSelected, setIsTopicSelected] = useState<boolean>(false);
   const cacheRef = useRef<Record<string, any>>({});
   const client = useLogin ? useMsal().instance : undefined;
-  
 
   const fetchFolders = useCallback(async (idToken: string | undefined) => {
     try {

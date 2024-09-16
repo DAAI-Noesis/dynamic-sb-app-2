@@ -23,10 +23,6 @@ import styles from "./Chat.module.css";
 
 import {
   chatApi,
-  chat2Api,
-  chat3Api,
-  chat4Api,
-  chat5Api,
   configApi,
   feedbackApi,
   RetrievalMode,
@@ -35,8 +31,7 @@ import {
   ChatAppRequest,
   ResponseMessage,
   VectorFieldOptions,
-  GPT4VInput,
-  askApi
+  GPT4VInput
 } from "../../api";
 import { UploadFile } from "../../components/UploadFile";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
@@ -164,6 +159,8 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       GPT4VInput.TextAndImages
     );
     const [useGPT4V, setUseGPT4V] = useState<boolean>(false);
+
+    // const [topico, setTopico] = useState<string>("");
     
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
@@ -226,17 +223,17 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       token: string | undefined
     ): Promise<Response> => {
       if (activeUseCase === USE_CASES.THEME_1)
-        return await askApi(request, token);
+        return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_2)
         return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_3)
-        return await chat2Api(request, token);
+        return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_4)
-        return await chat3Api(request, token);
+        return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_5)
-        return await chat4Api(request, token);
+        return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_6)
-        return await chat5Api(request, token);
+        return await chatApi(request, token);
 
       throw new Error(`Unhandled use case: ${activeUseCase}`);
     };
@@ -353,7 +350,8 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
               use_groups_security_filter: useGroupsSecurityFilter,
               vector_fields: vectorFieldList,
               use_gpt4v: useGPT4V,
-              gpt4v_input: gpt4vInput
+              gpt4v_input: gpt4vInput,
+              // topico
             }
           },
           // ChatAppProtocol: Client must pass on any session state received from the server

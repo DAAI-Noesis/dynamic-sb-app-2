@@ -71,9 +71,8 @@ $dataArg = "`"$cwd/data/*`""
 $argumentList = "./app/backend/prepdocs.py $dataArg --verbose " + `
 "--subscriptionid $env:AZURE_SUBSCRIPTION_ID " + `
 "--storageaccount $env:AZURE_STORAGE_ACCOUNT --container $env:AZURE_STORAGE_CONTAINER --storageresourcegroup $env:AZURE_STORAGE_RESOURCE_GROUP " + `
-#"--searchservice $env:AZURE_SEARCH_SERVICE --index $env:AZURE_SEARCH_INDEX " + `
-"--searchservice $env:AZURE_SEARCH_SERVICE --index $env:AZURE_SEARCH_INDEX --index_t1 $env:AZURE_SEARCH_INDEX_T1 --index_t2 $env:AZURE_SEARCH_INDEX_T2 --index_t3 $env:AZURE_SEARCH_INDEX_T3 --index_t4 $env:AZURE_SEARCH_INDEX_T4 --index_t5 $env:AZURE_SEARCH_INDEX_T5 --index_t6 $env:AZURE_SEARCH_INDEX_T6  --index_t7 $env:AZURE_SEARCH_INDEX_T7 " + `
-# "--searchservice $env:AZURE_SEARCH_SERVICE --index $env:AZURE_SEARCH_INDEX --index_t1 $env:AZURE_SEARCH_INDEX_T1 --index_t2 $env:AZURE_SEARCH_INDEX_T2 " + `
+"--searchservice $env:AZURE_SEARCH_SERVICE --index $env:AZURE_SEARCH_INDEX " + `
+
 "$searchAnalyzerNameArg " + `
 "--openaihost `"$env:OPENAI_HOST`" --openaimodelname `"$env:AZURE_OPENAI_EMB_MODEL_NAME`" $openaiDimensionsArg " + `
 "--openaiservice `"$env:AZURE_OPENAI_SERVICE`" --openaideployment `"$env:AZURE_OPENAI_EMB_DEPLOYMENT`" " + `

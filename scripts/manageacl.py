@@ -174,6 +174,14 @@ class ManageAcl:
                         facetable=False,
                     ),
                 )
+                index_definition.fields.append(
+                    SimpleField(
+                        name="topico",
+                        type="Edm.String",
+                        filterable=True,
+                        facetable=True,
+                    ),
+                )
             await search_index_client.create_or_update_index(index_definition)
 
     async def update_storage_urls(self, search_client: SearchClient):
@@ -228,8 +236,7 @@ async def main(args: Any):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Manage ACLs in a search index",
-        # epilog="Example: manageacl.py --searchservice mysearch --index myindex --acl-action enable_acls",
-        epilog="Example: manageacl.py --searchservice mysearch --index_t1 --index_t2 --index_t3 --index_t4 --index_t5 --index_t6 --index_t7 myindex --acl-action enable_acls",
+        epilog="Example: manageacl.py --searchservice mysearch --index myindex --acl-action enable_acls",
     )
     parser.add_argument(
         "--search-service",
@@ -238,41 +245,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--index",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t1",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t2",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t3",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t4",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t5",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t6",
-        required=True,
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t7",
-        required=True,
         help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
     )
     parser.add_argument(

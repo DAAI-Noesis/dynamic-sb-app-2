@@ -6,21 +6,7 @@ from quart import abort, current_app, request
 
 from config import (
     CONFIG_AUTH_CLIENT,
-    CONFIG_AUTH_CLIENT_T1,
-    CONFIG_AUTH_CLIENT_T2,
-    CONFIG_AUTH_CLIENT_T3,
-    CONFIG_AUTH_CLIENT_T4,
-    CONFIG_AUTH_CLIENT_T5,
-    CONFIG_AUTH_CLIENT_T6,
-    CONFIG_AUTH_CLIENT_T7,
-    CONFIG_SEARCH_CLIENT,
-    CONFIG_SEARCH_CLIENT_T1,
-    CONFIG_SEARCH_CLIENT_T2,
-    CONFIG_SEARCH_CLIENT_T3,
-    CONFIG_SEARCH_CLIENT_T4,
-    CONFIG_SEARCH_CLIENT_T5,
-    CONFIG_SEARCH_CLIENT_T6,
-    CONFIG_SEARCH_CLIENT_T7
+    CONFIG_SEARCH_CLIENT
 )
 from core.authentication import AuthError
 from error import error_response
@@ -34,8 +20,8 @@ def authenticated_path(route_fn: Callable[[str, Dict[str, Any]], Any]):
     @wraps(route_fn)
     async def auth_handler(path=""):
         # If authentication is enabled, validate the user can access the file
-        auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
-        search_client = current_app.config[CONFIG_SEARCH_CLIENT_T1]
+        auth_helper = current_app.config[CONFIG_AUTH_CLIENT]
+        search_client = current_app.config[CONFIG_SEARCH_CLIENT]
         authorized = False
         try:
             auth_claims = await auth_helper.get_auth_claims_if_enabled(request.headers)
@@ -92,7 +78,7 @@ def authenticated_path(route_fn: Callable[[str, Dict[str, Any]], Any]):
 
 #     @wraps(route_fn)
 #     async def auth_handler():
-#         auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
+#         auth_helper = current_app.config[CONFIG_AUTH_CLIENT]
 #         try:
 #             auth_claims = await auth_helper.get_auth_claims_if_enabled(request.headers)
 #         except AuthError:

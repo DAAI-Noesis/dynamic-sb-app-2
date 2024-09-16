@@ -149,7 +149,7 @@
 #                         vector_search_profile_name="embedding_config",
 #                     ),
 #                 )
-       
+
 #         for index_name in self.search_info.index_name_list:                
 #             index = SearchIndex(
 #                 name= index_name,
@@ -401,6 +401,12 @@ class SearchManager:
                     filterable=True,
                     facetable=False,
                 ),
+                SimpleField(
+                    name="topico",
+                    type="Edm.String",
+                    filterable=True,
+                    facetable=True,
+                ),
             ]
             if self.use_acls:
                 fields.append(
@@ -433,61 +439,69 @@ class SearchManager:
                         vector_search_profile_name="embedding_config",
                     ),
                 )
-
-            for index_name in self.search_info.index_name_list: 
-                index = SearchIndex(
-                    # name=self.search_info.index_name,
-                    name = index_name,
-                    fields=fields,
-                    semantic_search=SemanticSearch(
-                        configurations=[
-                            SemanticConfiguration(
-                                name="default",
-                                prioritized_fields=SemanticPrioritizedFields(
-                                    title_field=None, content_fields=[SemanticField(field_name="content")]
-                                ),
-                            )
-                        ]
-                    ),
-                    vector_search=VectorSearch(
-                        algorithms=[
-                            HnswAlgorithmConfiguration(
-                                name="hnsw_config",
-                                parameters=HnswParameters(metric="cosine"),
-                            )
-                        ],
-                        profiles=[
-                            VectorSearchProfile(
-                                name="embedding_config",
-                                algorithm_configuration_name="hnsw_config",
-                                vectorizer=(
-                                    f"{self.search_info.index_name}-vectorizer" if self.use_int_vectorization else None
-                                ),
-                            ),
-                        ],
-                        vectorizers=vectorizers,
-                    ),
-                )
-                #if self.search_info.index_name not in [name async for name in search_index_client.list_index_names()]:
-                if index_name not in [name async for name in search_index_client.list_index_names()]:
-                    # logger.info("Creating %s search index", self.search_info.index_name)
-                    # await search_index_client.create_index(index)
-                    logger.info("Creating %s search index", index_name)
-                    await search_index_client.create_index(index)
-                else:
-                    logger.info("Search index %s already exists", index_name)
-                    index_definition = await search_index_client.get_index(index_name)
-                    if not any(field.name == "storageUrl" for field in index_definition.fields):
-                        logger.info("Adding storageUrl field to index %s", index_name)
-                        index_definition.fields.append(
-                            SimpleField(
-                                name="storageUrl",
-                                type="Edm.String",
-                                filterable=True,
-                                facetable=False,
+            
+            index = SearchIndex(
+                name=self.search_info.index_name,
+                fields=fields,
+                semantic_search=SemanticSearch(
+                    configurations=[
+                        SemanticConfiguration(
+                            name="default",
+                            prioritized_fields=SemanticPrioritizedFields(
+                                title_field=None, content_fields=[SemanticField(field_name="content")]
                             ),
                         )
-                        await search_index_client.create_or_update_index(index_definition)
+                    ]
+                ),
+                vector_search=VectorSearch(
+                    algorithms=[
+                        HnswAlgorithmConfiguration(
+                            name="hnsw_config",
+                            parameters=HnswParameters(metric="cosine"),
+                        )
+                    ],
+                    profiles=[
+                        VectorSearchProfile(
+                            name="embedding_config",
+                            algorithm_configuration_name="hnsw_config",
+                            vectorizer=(
+                                f"{self.search_info.index_name}-vectorizer" if self.use_int_vectorization else None
+                            ),
+                        ),
+                    ],
+                    vectorizers=vectorizers,
+                ),
+            )
+            
+            if self.search_info.index_name not in [name async for name in search_index_client.list_index_names()]:
+            # if index_name not in [name async for name in search_index_client.list_index_names()]:
+                logger.info("Creating %s search index", self.search_info.index_name)
+                await search_index_client.create_index(index)
+                # logger.info("Creating %s search index", index_name)
+                # await search_index_client.create_index(index)
+            else:
+                logger.info("Search index %s already exists", self.search_info.index_name)
+                index_definition = await search_index_client.get_index(self.search_info.index_name)
+                if not any(field.name == "storageUrl" for field in index_definition.fields):
+                    logger.info("Adding storageUrl field to index %s", self.search_info.index_name)
+                    index_definition.fields.append(
+                        SimpleField(
+                            name="storageUrl",
+                            type="Edm.String",
+                            filterable=True,
+                            facetable=False,
+                        ),
+                    )
+                    logger.info("Adding topico field to index %s", self.search_info.index_name)
+                    index_definition.fields.append(
+                        SimpleField(
+                            name="topico",
+                            type="Edm.String",
+                            filterable=True,
+                            facetable=True,
+                        ),
+                    )
+                    await search_index_client.create_or_update_index(index_definition)
                         
     async def update_content(
         self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
@@ -521,6 +535,10 @@ class SearchManager:
                 if url:
                     for document in documents:
                         document["storageUrl"] = url
+                        start_index = url.find('https://sagenaidev003.dfs.core.windows.net/content/') + len('https://sagenaidev003.dfs.core.windows.net/content/')
+                        end_index = url.find('%2F')
+                        topico = url[start_index:end_index]
+                        document['topico'] = topico
                 if self.embeddings:
                     embeddings = await self.embeddings.create_embeddings(
                         texts=[section.split_page.text for section in batch]
@@ -534,7 +552,7 @@ class SearchManager:
                 await search_client.upload_documents(documents)
                 
     async def update_partial_content(
-    self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
+        self, index_name: str, sections: List[Section], image_embeddings: Optional[List[List[float]]] = None, url: Optional[str] = None
     ):
         MAX_BATCH_SIZE = 1000
         section_batches = [sections[i: i + MAX_BATCH_SIZE] for i in range(0, len(sections), MAX_BATCH_SIZE)]

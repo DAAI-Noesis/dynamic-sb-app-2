@@ -22,41 +22,6 @@ export function getHeaders(
   return headers;
 }
 
-
-export async function askApi(
-  request: ChatAppRequest,
-  idToken: string | undefined
-): Promise<Response> {
-  const response = await fetch(`${BACKEND_URI}/ask`, {
-    method: "POST",
-    headers: getHeaders(idToken),
-    body: JSON.stringify(request)
-  });
-
-  // const parsedResponse: ChatAppResponseOrError = await response.json();
-  if (response.status > 299 || !response.ok) {
-    const parsedResponse: ChatAppResponseOrError = await response.json();
-    throw Error(parsedResponse.error || "Unknown error");
-  }
-
-  return response;
-}
-
-// export async function askApi(request: ChatAppRequest, idToken: string | undefined): Promise<ChatAppResponse> {
-//   const response = await fetch(`${BACKEND_URI}/ask`, {
-//       method: "POST",
-//       headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
-//       body: JSON.stringify(request)
-//   });
-
-//   const parsedResponse: ChatAppResponseOrError = await response.json();
-//   if (response.status > 299 || !response.ok) {
-//       throw Error(parsedResponse.error || "Unknown error");
-//   }
-
-//   return parsedResponse as ChatAppResponse;
-// }
-
 export async function configApi(idToken: string | undefined): Promise<Config> {
   const response = await fetch(`${BACKEND_URI}/config`, {
     method: "GET",
@@ -84,47 +49,6 @@ export async function chatApi(
 //       body: JSON.stringify(request)
 //   });
 // }
-
-export async function chat2Api(
-  request: ChatAppRequest,
-  idToken: string | undefined
-): Promise<Response> {
-  return await fetch(`${BACKEND_URI}/chat2`, {
-      method: "POST",
-      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
-      body: JSON.stringify(request)
-  });
-}
-export async function chat3Api(
-  request: ChatAppRequest,
-  idToken: string | undefined
-): Promise<Response> {
-  return await fetch(`${BACKEND_URI}/chat3`, {
-      method: "POST",
-      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
-      body: JSON.stringify(request)
-  });
-}
-export async function chat4Api(
-  request: ChatAppRequest,
-  idToken: string | undefined
-): Promise<Response> {
-  return await fetch(`${BACKEND_URI}/chat4`, {
-      method: "POST",
-      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
-      body: JSON.stringify(request)
-  });
-}
-export async function chat5Api(
-  request: ChatAppRequest,
-  idToken: string | undefined
-): Promise<Response> {
-  return await fetch(`${BACKEND_URI}/chat5`, {
-      method: "POST",
-      headers: { ...getHeaders(idToken), "Content-Type": "application/json" },
-      body: JSON.stringify(request)
-  });
-}
 
 export async function listFoldersApi(idToken: string | undefined): Promise<string[]> {
   try {

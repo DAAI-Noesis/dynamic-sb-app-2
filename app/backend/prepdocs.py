@@ -42,7 +42,7 @@ def clean_key_if_exists(key: Union[str, None]) -> Union[str, None]:
 
 
 async def setup_search_info(
-    search_service: str, index_name_list: List[str], azure_credential: AsyncTokenCredential, search_key: Union[str, None] = None
+    search_service: str, index_name: str, azure_credential: AsyncTokenCredential, search_key: Union[str, None] = None
 ) -> SearchInfo:
     search_creds: Union[AsyncTokenCredential, AzureKeyCredential] = (
         azure_credential if search_key is None else AzureKeyCredential(search_key)
@@ -51,9 +51,7 @@ async def setup_search_info(
     return SearchInfo(
         endpoint=f"https://{search_service}.search.windows.net/",
         credential=search_creds,
-        # index_name_list=["index_t1","index_t2","index_t3"]
-        # index_name_list=["index_t1","index_t2"]
-        index_name_list=index_name_list
+        index_name=index_name
     )
 
 
@@ -89,7 +87,7 @@ def setup_list_file_strategy(
     list_file_strategy: ListFileStrategy
     if datalake_storage_account:
         if datalake_filesystem is None or datalake_path is None:
-             raise ValueError("DataLake file system and path are required when using Azure Data Lake Gen2")
+            raise ValueError("DataLake file system and path are required when using Azure Data Lake Gen2")
         adls_gen2_creds: Union[AsyncTokenCredential, str] = azure_credential if datalake_key is None else datalake_key
         logger.info("Using Data Lake Gen2 Storage Account: %s", datalake_storage_account)
         list_file_strategy = ADLSGen2ListFileStrategy(
@@ -218,10 +216,7 @@ async def main(strategy: Strategy, setup_index: bool = True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Prepare documents by extracting content from PDFs, splitting content into sections, uploading to blob storage, and indexing in a search index.",
-        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 myindex -v",
-        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v",
-        epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 --index_t3 --index_t4 --index_t5 --index_t6 --index_t7 myindex -v",
-        # epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index_t1 --index_t2 myindex -v",
+        epilog="Example: prepdocs.py '.\\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v",
     )
     parser.add_argument("files", nargs="?", help="Files to be processed")
     parser.add_argument(
@@ -277,34 +272,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--index",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t1",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t2",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t3",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t4",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t5",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t6",
-        help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
-    )
-    parser.add_argument(
-        "--index_t7",
         help="Name of the Azure AI Search index where content should be indexed (will be created if it doesn't exist)",
     )
     parser.add_argument(
@@ -425,10 +392,7 @@ if __name__ == "__main__":
     search_info = loop.run_until_complete(
         setup_search_info(
             search_service=args.searchservice,
-            #index_name=args.index,
-            # index_name_list = ["index_t1","index_t2","index_t3"],
-            index_name_list = ["index_t1","index_t2","index_t3","index_t4","index_t5","index_t6","index_t7"],
-            # index_name_list=["index_t1","index_t2"],
+            index_name=args.index,
             azure_credential=azd_credential,
             search_key=clean_key_if_exists(args.searchkey),
         )

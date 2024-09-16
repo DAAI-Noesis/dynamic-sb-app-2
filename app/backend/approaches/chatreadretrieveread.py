@@ -94,6 +94,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         top = overrides.get("top", 3)
         minimum_search_score = overrides.get("minimum_search_score", 0.0)
         minimum_reranker_score = overrides.get("minimum_reranker_score", 0.0)
+        topico = overrides.get("topico")
 
         filter = self.build_filter(overrides, auth_claims)
         use_semantic_ranker = True if overrides.get("semantic_ranker") and has_text else False

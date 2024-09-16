@@ -48,28 +48,7 @@
       "value": "${AZURE_DOCUMENTINTELLIGENCE_LOCATION}"
     },
     "searchIndexName": {
-      "value": "${AZURE_SEARCH_INDEX=gptkbindex}"
-    },
-    "searchIndexName_T1": {
-      "value": "${AZURE_SEARCH_INDEX_T1=index_t1}"
-    },
-    "searchIndexName_T2": {
-      "value": "${AZURE_SEARCH_INDEX_T2=index_t2}"
-    },
-    "searchIndexName_T3": {
-      "value": "${AZURE_SEARCH_INDEX_T3=index_t3}"
-    },
-    "searchIndexName_T4": {
-      "value": "${AZURE_SEARCH_INDEX_T4=index_t4}"
-    },
-    "searchIndexName_T5": {
-      "value": "${AZURE_SEARCH_INDEX_T5=index_t5}"
-    },
-    "searchIndexName_T6": {
-      "value": "${AZURE_SEARCH_INDEX_T6=index_t6}"
-    },
-    "searchIndexName_T7": {
-      "value": "${AZURE_SEARCH_INDEX_T7=index_t7}"
+      "value": "${AZURE_SEARCH_INDEX=index}"
     },
     "searchServiceName": {
       "value": "${AZURE_SEARCH_SERVICE}"

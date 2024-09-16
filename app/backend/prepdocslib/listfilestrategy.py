@@ -218,7 +218,7 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
             async for path in filesystem_client.get_paths(path=self.data_lake_path, recursive=True):
                 if path.is_directory:
                     continue
-
+                
                 print(f"Found file path: {path.name}")
                 yield path.name
 
