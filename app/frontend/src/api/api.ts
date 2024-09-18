@@ -13,7 +13,7 @@ export function getHeaders(
     "Content-Type": "application/json"
   };
   // If using login and not using app services, add the id token of the logged in account as the authorization
-  if (useLogin && appServicesToken == null) {
+  if (useLogin && appServicesToken != null) {
     if (idToken) {
       headers["Authorization"] = `Bearer ${idToken}`;
     }
@@ -121,7 +121,6 @@ export async function feedbackApi(request: { UserQuestion: string; BotMessage: s
 //     throw error;
 //   }
 // }
-
 
 export function getCitationFilePath(citation: string, folder: string): string {
   return `${BACKEND_URI}/content/${folder}/${citation}`;

@@ -213,7 +213,6 @@
 
 // export default Layout;
 
-
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -229,14 +228,14 @@ const Layout = React.forwardRef<HTMLDivElement>((props, ref) => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<ChatHandles>(null);
 
-  // Set activeUseCase to null initially
   const [activeUseCase, setActiveUseCase] = useState<USE_CASES | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasUserScrolledUp, setHasUserScrolledUp] = useState<boolean>(false);
-  const [isChatVisible, setIsChatVisible] = useState<boolean>(false); // Boolean state for chat visibility
+  const [isChatVisible, setIsChatVisible] = useState<boolean>(false);
 
   const handleUseCaseSelect = (caseId: USE_CASES) => {
     setActiveUseCase(caseId);
+    setIsChatVisible(true); // Show chat when a use case is selected
   };
 
   const checkIfScrollIsAtBottom = () => {
@@ -270,7 +269,7 @@ const Layout = React.forwardRef<HTMLDivElement>((props, ref) => {
     return () => {
       mainContainerRef.current?.removeEventListener("scroll", checkHasScroll);
     };
-  });
+  }, []);
 
   return (
     <div className={styles.layout} ref={ref}>
@@ -293,7 +292,7 @@ const Layout = React.forwardRef<HTMLDivElement>((props, ref) => {
           {useLogin && <LoginButton />}
         </div>
       </header>
-      {/* Adicionar a barra vermelha aqui */}
+      {/* Add red bar here */}
       <div className={styles.redBar}></div>
       <div className={styles.bodyContainer}>
         <SideMenu
@@ -304,14 +303,21 @@ const Layout = React.forwardRef<HTMLDivElement>((props, ref) => {
         />
 
         <main ref={mainContainerRef} className={styles.mainContent}>
-          {isChatVisible && (
+          {!isChatVisible || activeUseCase === null ? (
+            <div className={styles.chatEmptyState}>
+              <div className={styles.selectTopicMessage}>
+              Olá, sou o chatbot SBG! <br></br>
+                   Seleciona um tópico da lista para conversarmos
+              </div>
+            </div>
+          ) : (
             <Chat
               ref={chatRef}
-              activeUseCase={activeUseCase} // Pass the activeUseCase which can now be null
+              activeUseCase={activeUseCase}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               hasUserScrolledUp={hasUserScrolledUp}
-              isChatVisible={isChatVisible} // Pass the boolean state
+              isChatVisible={isChatVisible}
             />
           )}
         </main>

@@ -132,16 +132,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%; /* Make it take the full height of the chat container */
+  height: 100%; /* Make it take the full height of the container */
   text-align: center;
-  color: #a32727;
-  background-color: #ffffff; /* Set a color that contrasts well with the background */
+  color: #a32727; /* Text color */
+  background-color: #ffffff; /* Background color (ensure it contrasts with text) */
 }
 
 .selectTopicMessage {
-  font-size: 1.2rem; /* Adjust the font size as necessary */
-  padding: 20px; /* Add some padding to make it look better */
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ab2328;
+  background-color: green;
 }
+
 
 .topRight {
   position: absolute; /* Makes it possible to position this element relative to the parent */
@@ -181,6 +184,9 @@
 .feedback:focus {
   outline: none;
   box-shadow: 0 0 5px rgba(50, 50, 50, 0.5); /* Subtle shadow on focus for accessibility */
+}
+.feedback-buttons {
+  margin-top: 10px; /* Space above the feedback buttons */
 }
 
 

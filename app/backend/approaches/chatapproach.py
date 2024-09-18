@@ -100,6 +100,7 @@ class ChatApproach(Approach, ABC):
 
     async def run_with_streaming(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
@@ -108,6 +109,9 @@ class ChatApproach(Approach, ABC):
         extra_info, chat_coroutine = await self.run_until_final_call(
             messages, overrides, auth_claims, should_stream=True
         )
+        # extra_info, chat_coroutine = await self.run_until_final_call(
+        #     topico, messages, overrides, auth_claims, should_stream=True
+        # )
         yield {
             "choices": [
                 {
@@ -157,6 +161,7 @@ class ChatApproach(Approach, ABC):
 
     async def run(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         stream: bool = False,
         session_state: Any = None,
@@ -168,4 +173,5 @@ class ChatApproach(Approach, ABC):
         if stream is False:
             return await self.run_without_streaming(messages, overrides, auth_claims, session_state)
         else:
+            # return self.run_with_streaming(topico, messages, overrides, auth_claims, session_state)
             return self.run_with_streaming(messages, overrides, auth_claims, session_state)
