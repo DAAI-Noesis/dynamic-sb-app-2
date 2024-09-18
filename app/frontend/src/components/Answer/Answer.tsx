@@ -228,7 +228,7 @@ export const Answer = ({
   <p style={{ fontSize: '14px', color: '#333', marginBottom: '10px' }}>
    
   </p>
-  <small style={{ position: 'absolute', right: '10px', bottom: '20px', fontSize: '12px', color: '#ab2328', fontWeight: 'bold' }}>
+  <small style={{ position: 'absolute', right: '10px', bottom: '2px', fontSize: '12px', color: '#ab2328', fontWeight: 'bold' }}>
     Respostas geradas por Inteligência Artificial. Podem ocorrer erros.
   </small>
 </Stack.Item>

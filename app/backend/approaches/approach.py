@@ -262,6 +262,7 @@ class Approach(ABC):
 
     async def run(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         stream: bool = False,
         session_state: Any = None,

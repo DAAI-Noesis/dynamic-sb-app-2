@@ -26,30 +26,74 @@ from core.authentication import AuthError
 from error import error_response
 
 
+# def authenticated_path(route_fn: Callable[[str, Dict[str, Any]], Any]):
+#     """
+#     Decorator for routes that request a specific file that might require access control enforcement
+#     """
+
+#     @wraps(route_fn)
+#     async def auth_handler(path=""):
+#         # If authentication is enabled, validate the user can access the file
+#         auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
+#         search_client = current_app.config[CONFIG_SEARCH_CLIENT_T1]
+#         authorized = False
+#         try:
+#             auth_claims = await auth_helper.get_auth_claims_if_enabled(request.headers)
+#             logging.info(f"Auth claims: {auth_claims}")
+#             authorized = await auth_helper.check_path_auth(path, auth_claims, search_client)
+#             logging.info(f"Authorization for path {path}: {authorized}")
+#         except AuthError:
+#             abort(403)
+#             logging.info(f"Auth claims: {auth_claims}")
+#             logging.info(f"Authorization for path {path}: {authorized}")
+#         except Exception as error:
+#             logging.exception("Problem checking path auth %s", error)
+#             return error_response(error, route="/content")
+
+#         if not authorized:
+#             abort(403)
+#             logging.info(f"Auth claims: {auth_claims}")
+#             logging.info(f"Authorization for path {path}: {authorized}")
+
+
+#         return await route_fn(path, auth_claims)
+
+#     return auth_handler
 def authenticated_path(route_fn: Callable[[str, Dict[str, Any]], Any]):
     """
-    Decorator for routes that request a specific file that might require access control enforcement
+    Decorator for routes that might require access control enforcement.
     """
 
     @wraps(route_fn)
     async def auth_handler(path=""):
-        # If authentication is enabled, validate the user can access the file
-        auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
-        search_client = current_app.config[CONFIG_SEARCH_CLIENT_T1]
-        authorized = False
-        try:
-            auth_claims = await auth_helper.get_auth_claims_if_enabled(request.headers)
-            authorized = await auth_helper.check_path_auth(path, auth_claims, search_client)
-        except AuthError:
-            abort(403)
-        except Exception as error:
-            logging.exception("Problem checking path auth %s", error)
-            return error_response(error, route="/content")
+        # Check if AZURE_ENFORCE_ACCESS_CONTROL is enabled
+        enforce_access_control = current_app.config.get('AZURE_ENFORCE_ACCESS_CONTROL', 'false') == 'true'
+        
+        # If enforcement is enabled and the path is not for citations, perform access control check
+        if enforce_access_control and not path.startswith("content/"):  # Adjust pattern as needed
+            auth_helper = current_app.config[CONFIG_AUTH_CLIENT_T1]
+            search_client = current_app.config[CONFIG_SEARCH_CLIENT_T1]
+            authorized = False
+            try:
+                auth_claims = await auth_helper.get_auth_claims_if_enabled(request.headers)
+                logging.info(f"Auth claims: {auth_claims}")
+                authorized = await auth_helper.check_path_auth(path, auth_claims, search_client)
+                logging.info(f"Authorization for path {path}: {authorized}")
+            except AuthError:
+                logging.info(f"Auth claims: {auth_claims}")
+                logging.info(f"Authorization for path {path}: {authorized}")
+                abort(403)
+            except Exception as error:
+                logging.exception("Problem checking path auth %s", error)
+                return error_response(error, route="/content")
 
-        if not authorized:
-            abort(403)
+            if not authorized:
+                logging.info(f"Auth claims: {auth_claims}")
+                logging.info(f"Authorization for path {path}: {authorized}")
+                abort(403)
 
-        return await route_fn(path, auth_claims)
+        # If path is for citations or access control is not enforced, proceed with the route function
+        return await route_fn(path, None)
 
     return auth_handler
 

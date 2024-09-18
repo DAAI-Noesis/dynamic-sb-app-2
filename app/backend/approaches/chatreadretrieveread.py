@@ -66,6 +66,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
     @overload
     async def run_until_final_call(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
@@ -75,6 +76,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
     @overload
     async def run_until_final_call(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
@@ -83,6 +85,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
     async def run_until_final_call(
         self,
+        # topico: string ?
         messages: list[ChatCompletionMessageParam],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
@@ -160,6 +163,11 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
         print(f"filters:", filter) 
         logging.info(f"filters:", filter)
+        # Message: 'filters:'
+        # Arguments: ("((oids/any(g:search.in(g, '')) or groups/any(g:search.in(g, ''))) or (not oids/any() and not groups/any()))",)
+        # eu acho que vai ser ALGO DESTE GENERO:
+        # ("((topico/any(g:search.in(g, '<o nome do topico>')) or oids/any(g:search.in(g, '')) or groups/any(g:search.in(g, ''))) or (not oids/any() and not groups/any()))",)
+        # aqui alterar a string 'filter' para filtrar apenas chunks como o parametro topico igual à string topico
 
 
         results = await self.search(

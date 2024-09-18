@@ -84,17 +84,34 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     ref
   ) => {
     const [userFeedback, setUserFeedback] = useState<boolean | null>(null);
+    const [feedback, setFeedback] = useState<{ [key: number]: boolean }>({});
+
+
     
 
     // Function to handle feedback submission
-    const handleFeedback = async (feedback: boolean, question: string, botMessage: string) => {
-      console.log("Button clicked, feedback:", feedback); // Debug line
-      setUserFeedback(feedback);
+    // const handleFeedback = async (feedback: boolean, question: string, botMessage: string) => {
+    //   console.log("Button clicked, feedback:", feedback); // Debug line
+    //   setUserFeedback(feedback);
 
+    //   const data = {
+    //     UserQuestion: question,
+    //     BotMessage: botMessage,
+    //     UserFeedback: feedback,
+    //   };
+    const handleFeedback = async (feedbackValue: boolean, index: number, question: string, botMessage: string) => {
+      console.log("Button clicked, feedback:", feedbackValue);
+    
+      // Update feedback for the specific message (tracked by index)
+      setFeedback((prevFeedback) => ({
+        ...prevFeedback,
+        [index]: feedbackValue, // Store feedback for the message at the given index
+      }));
+    
       const data = {
         UserQuestion: question,
         BotMessage: botMessage,
-        UserFeedback: feedback,
+        UserFeedback: feedbackValue,
       };
 
       console.log("data:");
@@ -640,339 +657,277 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       return useCaseIndex !== -1 ? folders[useCaseIndex] : null;
     }, [folders, activeUseCase]);
     
-
     return (
       <div className={styles.container}>
-         {isChatVisible && ( // Conditionally render the chat interface
+        {/* Render the message when chat is not visible or no topic is selected */}
+        {!isChatVisible || activeUseCase == null ? (
+          <div className={styles.chatEmptyState}>
+            <div className={styles.selectTopicMessage}>
+              Please select a topic
+            </div>
+          </div>
+        ) : (
           <div className={styles.chatRoot}>
             <div className={styles.commandsContainer}>
-          <ClearChatButton
-            className={styles.commandButton}
-            onClick={clearChat}
-            disabled={!lastQuestionRef.current || isLoading}
-          />
-           {showUserUpload && <UploadFile className={styles.commandButton} disabled={!isLoggedIn(client)} />}
-        </div>
-          <div
-            className={`${styles.chatContainer} ${
-              isAnalysisPanelExpanded && styles.hideChat
-            }`}
-          >
-            {/* Display message if no topic has been clicked yet */}
-            {activeUseCase == null ? (
-               <div className={styles.chatEmptyState}>
-               <div className={styles.selectTopicMessage}>
-                 Please select a topic
-               </div>
-             </div>
-            ) : (
-              <>
-            
-
-
-
-
-
-            {!lastQuestionRef.current ? (
-              <div className={styles.chatEmptyState}>
-                <ul>
-              {folders.length > 0 ? (
-                <>
-                  {/* Find the selected folder based on activeUseCase */}
-                  {folders.map((folder, index) => {
-                    const isSelected = activeUseCase === THEME_MAPPINGS[index];
-                    return (
-                      isSelected && (
-                        <h2 key={index} style={{ color: '#080808' }}>
-                          Tópico {folder}
-                        </h2>
-                      )
-                    );
-                  })}
-                </>
-              ) : (
-                <li>A carregar o tópico...</li>
-              )}
-            </ul>
-                {/* <h2 className={styles.chatEmptyStateSubtitle}>
-                Faz uma pergunta ou adiciona um exemplo
-                </h2> */}
-                <ExampleList
-                  onExampleClicked={onExampleClicked}
-                  useGPT4V={useGPT4V}
-                  activeUseCase={activeUseCase}
-                />
-                
-              </div>
-            ) : (
-              <div className={styles.chatMessageStream} ref={chatRef}>
-                {isStreaming &&
-                  streamedAnswers.map((streamedAnswer, index) => (
-                    <div key={index}>
-                      <UserChatMessage message={streamedAnswer[0]} />
-                      <div className={styles.chatMessageGpt}>
-                        <Answer
-                          isStreaming={true}
-                          isLastAnswer={
-                            streamedAnswers.length - 1 === index && !isLoading
-                          }
-                          key={index}
-                          answer={streamedAnswer[1]}
-                          isSelected={false}
-                          onCitationClicked={c => onShowCitation(c, index)}
-                          onFollowupQuestionClicked={q => makeApiRequest(q)}
-                          showFollowupQuestions={
-                            useSuggestFollowupQuestions &&
-                            answers.length - 1 === index
-                          }
-                          activeUseCase={activeUseCase}
-                          selectedFolder={selectedFolder}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                {!isStreaming &&
-                  answers.map((answer, index) => (
-                    <div key={index}>
-                      <UserChatMessage message={answer[0]} />
-                      <div className={styles.chatMessageGpt}>
-                        <Answer
-                          isStreaming={false}
-                          isLastAnswer={
-                            answers.length - 1 === index && !isLoading
-                          }
-                          key={index}
-                          answer={answer[1]}
-                          isSelected={
-                            selectedAnswer === index &&
-                            activeAnalysisPanelTab !== null
-                          }
-                          onCitationClicked={c => onShowCitation(c, index)}
-                          onFollowupQuestionClicked={q => makeApiRequest(q)}
-                          showFollowupQuestions={
-                            useSuggestFollowupQuestions &&
-                            answers.length - 1 === index
-                          }
-                          activeUseCase={activeUseCase}
-                          selectedFolder={selectedFolder}
-                        />
-                        <div>
-                        {/* <button
-                          type="button"
-                          className={`${styles.feedback}`}
-                          onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}
-                        >
-                          ola
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`${styles.feedbackselected}`}
-                          onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}
-                        >
-                          ola
-                        </button> */}
-
-                        <button
-                          onClick={() => handleFeedback(true, answer[0], answer[1].choices[0].message.content)}
-                          className={`${styles.feedback} ${userFeedback === true ? styles.selected : ''}`}
-                          title="Thumbs up - Positive Feedback"
-                        >
-                          <i className={`fa-sharp fa-solid fa-thumbs-up ${userFeedback === true ? styles.iconSelected : ''}`}></i>
-                        </button>
-
-                        <button
-                          onClick={() => handleFeedback(false, answer[0], answer[1].choices[0].message.content)}
-                          className={`${styles.feedback} ${userFeedback === false ? styles.selected : ''}`}
-                          title="Thumbs down - Negative Feedback"
-                        >
-                          <i className={`fa-regular fa-thumbs-down ${userFeedback === false ? styles.iconSelected : ''}`}></i>
-                        </button>
-
-
-
-
-
-
-
-
-
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                {isLoading && (
-                  <>
-                    <UserChatMessage message={lastQuestionRef.current} />
-                    <div className={styles.chatMessageGptMinWidth}>
-                      <AnswerLoading />
-                    </div>
-                  </>
-                )}
-                {error ? (
-                  <>
-                    <UserChatMessage message={lastQuestionRef.current} />
-                    <div className={styles.chatMessageGptMinWidth}>
-                      <AnswerError
-                        error={error.toString()}
-                        onRetry={() => makeApiRequest(lastQuestionRef.current)}
-                      />
-                    </div>
-                  </>
-                ) : null}
-                <div ref={chatMessageStreamEnd} />
-              </div>
-            )}
-
-            <div className={styles.chatInput}>
-              <QuestionInput
-                clearOnSend
-                placeholder="Escreva uma questão."
-                disabled={isLoading}
-                onSend={question => makeApiRequest(question)}
+              <ClearChatButton
+                className={styles.commandButton}
+                onClick={clearChat}
+                disabled={!lastQuestionRef.current || isLoading}
               />
+              {showUserUpload && <UploadFile className={styles.commandButton} disabled={!isLoggedIn(client)} />}
             </div>
-            </>
+            <div
+              className={`${styles.chatContainer} ${
+                isAnalysisPanelExpanded && styles.hideChat
+              }`}
+            >
+              {!lastQuestionRef.current ? (
+                <div className={styles.chatEmptyState}>
+                  <ul>
+                    {folders.length > 0 ? (
+                      folders.map((folder, index) => {
+                        const isSelected = activeUseCase === THEME_MAPPINGS[index];
+                        return (
+                          isSelected && (
+                            <h2 key={index} style={{ color: '#080808' }}>
+                              Tópico {folder}
+                            </h2>
+                          )
+                        );
+                      })
+                    ) : (
+                      <li>A carregar o tópico...</li>
+                    )}
+                  </ul>
+                  <ExampleList
+                    onExampleClicked={onExampleClicked}
+                    useGPT4V={useGPT4V}
+                    activeUseCase={activeUseCase}
+                  />
+                </div>
+              ) : (
+                <div className={styles.chatMessageStream} ref={chatRef}>
+                  {isStreaming
+                    ? streamedAnswers.map((streamedAnswer, index) => (
+                        <div key={index}>
+                          <UserChatMessage message={streamedAnswer[0]} />
+                          <div className={styles.chatMessageGpt}>
+                            <Answer
+                              isStreaming={true}
+                              isLastAnswer={streamedAnswers.length - 1 === index && !isLoading}
+                              answer={streamedAnswer[1]}
+                              isSelected={false}
+                              onCitationClicked={c => onShowCitation(c, index)}
+                              onFollowupQuestionClicked={q => makeApiRequest(q)}
+                              showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
+                              activeUseCase={activeUseCase}
+                              selectedFolder={selectedFolder}
+                            />
+                          </div>
+                        </div>
+                      ))
+                    : answers.map((answer, index) => (
+                        <div key={index}>
+                          <UserChatMessage message={answer[0]} />
+                          <div className={styles.chatMessageGpt}>
+                            <Answer
+                              isStreaming={false}
+                              isLastAnswer={answers.length - 1 === index && !isLoading}
+                              answer={answer[1]}
+                              isSelected={selectedAnswer === index && activeAnalysisPanelTab !== null}
+                              onCitationClicked={c => onShowCitation(c, index)}
+                              onFollowupQuestionClicked={q => makeApiRequest(q)}
+                              showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
+                              activeUseCase={activeUseCase}
+                              selectedFolder={selectedFolder}
+                            />
+                            <div className={styles.feedbackButtons}>
+                              {/* Thumbs up button */}
+                              <button
+                                onClick={() => handleFeedback(true, index, answer[0], answer[1].choices[0].message.content)}
+                                className={`${styles.feedback} ${feedback[index] === true ? styles.selected : ''}`}
+                                title="Thumbs up - Positive Feedback"
+                              >
+                                <i className={`fa-sharp fa-solid fa-thumbs-up ${feedback[index] === true ? styles.iconSelected : ''}`}></i>
+                              </button>
+    
+                              {/* Thumbs down button */}
+                              <button
+                                onClick={() => handleFeedback(false, index, answer[0], answer[1].choices[0].message.content)}
+                                className={`${styles.feedback} ${feedback[index] === false ? styles.selected : ''}`}
+                                title="Thumbs down - Negative Feedback"
+                              >
+                                <i className={`fa-regular fa-thumbs-down ${feedback[index] === false ? styles.iconSelected : ''}`}></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  {isLoading && (
+                    <>
+                      <UserChatMessage message={lastQuestionRef.current || ''} />
+                      <div className={styles.chatMessageGptMinWidth}>
+                        <AnswerLoading />
+                      </div>
+                    </>
+                  )}
+                  {error ? (
+                    <>
+                      <UserChatMessage message={lastQuestionRef.current || ''} />
+                      <div className={styles.chatMessageGptMinWidth}>
+                        <AnswerError
+                          error={error.toString()}
+                          onRetry={() => makeApiRequest(lastQuestionRef.current || '')}
+                        />
+                      </div>
+                    </>
+                  ) : null}
+                  <div ref={chatMessageStreamEnd} />
+                </div>
+              )}
+    
+              <div className={styles.chatInput}>
+                <QuestionInput
+                  clearOnSend
+                  placeholder="Escreva uma questão."
+                  disabled={isLoading}
+                  onSend={question => makeApiRequest(question)}
+                />
+              </div>
+            </div>
+    
+            {answers.length > 0 && activeAnalysisPanelTab && (
+              <AnalysisPanel
+                className={styles.chatAnalysisPanel}
+                activeCitation={activeCitation}
+                onActiveTabChanged={x => onToggleTab(x, selectedAnswer)}
+                citationHeight="810px"
+                answer={answers[selectedAnswer][1]}
+                activeTab={activeAnalysisPanelTab}
+              />
             )}
+    
+            <Panel
+              headerText="Configure answer generation"
+              isOpen={isConfigPanelOpen}
+              isBlocking={false}
+              onDismiss={() => setIsConfigPanelOpen(false)}
+              closeButtonAriaLabel="Close"
+              onRenderFooterContent={() => (
+                <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>
+                  Close
+                </DefaultButton>
+              )}
+              isFooterAtBottom={true}
+            >
+              <TextField
+                className={styles.chatSettingsSeparator}
+                defaultValue={promptTemplate}
+                label="Override prompt template"
+                multiline
+                autoAdjustHeight
+                onChange={onPromptTemplateChange}
+              />
+    
+              <Slider
+                className={styles.chatSettingsSeparator}
+                label="Temperature"
+                min={0}
+                max={1}
+                step={0.1}
+                defaultValue={temperature}
+                onChange={onTemperatureChange}
+                showValue
+                snapToStep
+              />
+    
+              <SpinButton
+                className={styles.chatSettingsSeparator}
+                label="Retrieve this many search results:"
+                min={1}
+                max={999}
+                defaultValue={retrieveCount.toString()}
+                onChange={onRetrieveCountChange}
+              />
+              <TextField
+                className={styles.chatSettingsSeparator}
+                label="Exclude category"
+                onChange={onExcludeCategoryChanged}
+              />
+    
+              {showSemanticRankerOption && (
+                <Checkbox
+                  className={styles.chatSettingsSeparator}
+                  checked={useSemanticRanker}
+                  label="Use semantic ranker for retrieval"
+                  onChange={onUseSemanticRankerChange}
+                />
+              )}
+              <Checkbox
+                className={styles.chatSettingsSeparator}
+                checked={useSemanticCaptions}
+                label="Use query-contextual summaries instead of whole documents"
+                onChange={onUseSemanticCaptionsChange}
+                disabled={!useSemanticRanker}
+              />
+              <Checkbox
+                className={styles.chatSettingsSeparator}
+                checked={useSuggestFollowupQuestions}
+                label="Suggest follow-up questions"
+                onChange={onUseSuggestFollowupQuestionsChange}
+              />
+    
+              {showGPT4VOptions && (
+                <GPT4VSettings
+                  gpt4vInputs={gpt4vInput}
+                  isUseGPT4V={useGPT4V}
+                  updateUseGPT4V={useGPT4V => setUseGPT4V(useGPT4V)}
+                  updateGPT4VInputs={inputs => setGPT4VInput(inputs)}
+                />
+              )}
+    
+              {showVectorOption && (
+                <VectorSettings
+                  retrievalMode={retrievalMode}
+                  showImageOptions={useGPT4V && showGPT4VOptions}
+                  updateVectorFields={(options: VectorFieldOptions[]) => setVectorFieldList(options)}
+                  onRetrievalModeChange={onRetrievalModeChange}
+                />
+              )}
+    
+              {useLogin && (
+                <Checkbox
+                  className={styles.chatSettingsSeparator}
+                  checked={useOidSecurityFilter || requireAccessControl}
+                  label="Use oid security filter"
+                  disabled={!isLoggedIn(client) || requireAccessControl}
+                  onChange={onUseOidSecurityFilterChange}
+                />
+              )}
+              {useLogin && (
+                <Checkbox
+                  className={styles.chatSettingsSeparator}
+                  checked={useGroupsSecurityFilter || requireAccessControl}
+                  label="Use groups security filter"
+                  disabled={!isLoggedIn(client) || requireAccessControl}
+                  onChange={onUseGroupsSecurityFilterChange}
+                />
+              )}
+    
+              <Checkbox
+                className={styles.chatSettingsSeparator}
+                checked={shouldStream}
+                label="Stream chat completion responses"
+                onChange={onShouldStreamChange}
+              />
+              {useLogin && <TokenClaimsDisplay />}
+            </Panel>
           </div>
-          
-
-          {answers.length > 0 && activeAnalysisPanelTab && (
-            <AnalysisPanel
-              className={styles.chatAnalysisPanel}
-              activeCitation={activeCitation}
-              onActiveTabChanged={x => onToggleTab(x, selectedAnswer)}
-              answer={answers[selectedAnswer][1]}
-              activeTab={activeAnalysisPanelTab}
-              onCitationClicked={c => onShowCitation(c, selectedAnswer)}
-              togglePanelExpansion={togglePanelExpansion}
-              isExpanded={isAnalysisPanelExpanded}
-            />
-          )}
-
-          <Panel
-            headerText="Configure answer generation"
-            isOpen={isConfigPanelOpen}
-            isBlocking={false}
-            onDismiss={() => setIsConfigPanelOpen(false)}
-            closeButtonAriaLabel="Close"
-            onRenderFooterContent={() => (
-              <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>
-                Close
-              </DefaultButton>
-            )}
-            isFooterAtBottom={true}
-          >
-            <TextField
-              className={styles.chatSettingsSeparator}
-              defaultValue={promptTemplate}
-              label="Override prompt template"
-              multiline
-              autoAdjustHeight
-              onChange={onPromptTemplateChange}
-            />
-
-            <Slider
-              className={styles.chatSettingsSeparator}
-              label="Temperature"
-              min={0}
-              max={1}
-              step={0.1}
-              defaultValue={temperature}
-              onChange={onTemperatureChange}
-              showValue
-              snapToStep
-            />
-
-            <SpinButton
-              className={styles.chatSettingsSeparator}
-              label="Retrieve this many search results:"
-              min={1}
-              max={999}
-              defaultValue={retrieveCount.toString()}
-              onChange={onRetrieveCountChange}
-            />
-            <TextField
-              className={styles.chatSettingsSeparator}
-              label="Exclude category"
-              onChange={onExcludeCategoryChanged}
-            />
-
-            {showSemanticRankerOption && (
-              <Checkbox
-                className={styles.chatSettingsSeparator}
-                checked={useSemanticRanker}
-                label="Use semantic ranker for retrieval"
-                onChange={onUseSemanticRankerChange}
-              />
-            )}
-            <Checkbox
-              className={styles.chatSettingsSeparator}
-              checked={useSemanticCaptions}
-              label="Use query-contextual summaries instead of whole documents"
-              onChange={onUseSemanticCaptionsChange}
-              disabled={!useSemanticRanker}
-            />
-            <Checkbox
-              className={styles.chatSettingsSeparator}
-              checked={useSuggestFollowupQuestions}
-              label="Suggest follow-up questions"
-              onChange={onUseSuggestFollowupQuestionsChange}
-            />
-
-            {showGPT4VOptions && (
-              <GPT4VSettings
-                gpt4vInputs={gpt4vInput}
-                isUseGPT4V={useGPT4V}
-                updateUseGPT4V={useGPT4V => {
-                  setUseGPT4V(useGPT4V);
-                }}
-                updateGPT4VInputs={inputs => setGPT4VInput(inputs)}
-              />
-            )}
-
-            {showVectorOption && (
-              <VectorSettings
-                retrievalMode={retrievalMode}
-                showImageOptions={useGPT4V && showGPT4VOptions}
-                updateVectorFields={(options: VectorFieldOptions[]) =>
-                  setVectorFieldList(options)
-                }
-                onRetrievalModeChange={onRetrievalModeChange}
-              />
-            )}
-
-            {useLogin && (
-              <Checkbox
-                className={styles.chatSettingsSeparator}
-                checked={useOidSecurityFilter || requireAccessControl}
-                label="Use oid security filter"
-                disabled={!isLoggedIn(client) || requireAccessControl}
-                onChange={onUseOidSecurityFilterChange}
-              />
-            )}
-            {useLogin && (
-              <Checkbox
-                className={styles.chatSettingsSeparator}
-                checked={useGroupsSecurityFilter || requireAccessControl}
-                label="Use groups security filter"
-                disabled={!isLoggedIn(client) || requireAccessControl}
-                onChange={onUseGroupsSecurityFilterChange}
-              />
-            )}
-
-            <Checkbox
-              className={styles.chatSettingsSeparator}
-              checked={shouldStream}
-              label="Stream chat completion responses"
-              onChange={onShouldStreamChange}
-            />
-            {useLogin && <TokenClaimsDisplay />}
-          </Panel>
-        </div>
-         )}
+        )}
       </div>
     );
+    
+      
   }
 );
 

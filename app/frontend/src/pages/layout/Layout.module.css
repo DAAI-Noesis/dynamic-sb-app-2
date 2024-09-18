@@ -90,3 +90,24 @@
   margin-top: 0px; /* Espaçamento entre o cabeçalho e a barra */
 }
 
+.chatEmptyState {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-height: 1024px;
+  color: #000000;
+  background-color: #ffffff; /* Fundo cinza claro para contraste */
+}
+
+.selectTopicMessage {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff; /* Cor do texto em vermelho */
+  background-color: #9c9a73;  /* Cor de fundo verde claro para contraste */
+  padding: 20px; /* Adiciona espaçamento interno */
+  border-radius: 10px; /* Cantos arredondados para uma aparência mais suave */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar a mensagem */
+}
+

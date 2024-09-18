@@ -13,11 +13,27 @@ export function getHeaders(
     "Content-Type": "application/json"
   };
   // If using login and not using app services, add the id token of the logged in account as the authorization
-  if (useLogin && appServicesToken == null) {
+  if (useLogin && appServicesToken != null) {
     if (idToken) {
       headers["Authorization"] = `Bearer ${idToken}`;
     }
   }
+
+  return headers;
+}
+
+export function getHeadersPdf(
+  idToken: string | undefined
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json"
+  };
+  // If using login and not using app services, add the id token of the logged in account as the authorization
+  // if (useLogin && appServicesToken != null) {
+  //   if (idToken) {
+  //     headers["Authorization"] = `Bearer ${idToken}`;
+  //   }
+  // }
 
   return headers;
 }
