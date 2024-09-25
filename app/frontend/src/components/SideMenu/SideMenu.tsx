@@ -186,24 +186,228 @@
 //   );
 // };
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// import { USE_CASES } from "../../helpers/constants";
+// import styles from "./SideMenu.module.css";
+// import {
+//   chatApi,
+//   listFoldersApi
+// } from "../../api";
+// import { ChatAppRequest } from "../../api/models";
+// import debounce from 'lodash.debounce';
+// import { useMsal } from "@azure/msal-react";
+// import { useLogin, getToken } from "../../authConfig";
+// import { getHeaders } from '../../api';
+
+// type SideMenuProps = {
+//   activeUseCase: USE_CASES | null;
+//   onCaseSelect: (chatId: USE_CASES) => void;
+//   isLoading: boolean;
+//   setIsChatVisible: (isVisible: boolean) => void; // Function to set chat visibility
+// };
+
+// export const THEME_MAPPINGS: USE_CASES[] = [
+//   USE_CASES.THEME_1,
+//   USE_CASES.THEME_2,
+//   USE_CASES.THEME_3,
+//   USE_CASES.THEME_4,
+//   USE_CASES.THEME_5,
+//   USE_CASES.THEME_6
+// ];
+
+// export const SideMenu = ({
+//   activeUseCase,
+//   onCaseSelect,
+//   isLoading,
+//   setIsChatVisible // Function to control chat visibility
+// }: SideMenuProps) => {
+//   const [folders, setFolders] = useState<string[]>([]);
+//   const [error, setError] = useState<string | null>(null);
+//   const [isTopicSelected, setIsTopicSelected] = useState<boolean>(false);
+//   const cacheRef = useRef<Record<string, any>>({});
+//   const client = useLogin ? useMsal().instance : undefined;
+
+//   const fetchFolders = useCallback(async (idToken: string | undefined) => {
+//     try {
+//       const folders = await listFoldersApi(idToken);
+//       setFolders(folders || []);
+//     } catch (error) {
+//       console.error('Error in fetchFolders:', error);
+//       setError(error instanceof Error ? error.message : 'Error fetching folders');
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const token = client ? await getToken(client) : undefined;
+//         await fetchFolders(token);
+//       } catch (error) {
+//         console.error('Error fetching data:', error);
+//       }
+//     };
+
+//     fetchData();
+//   }, [client, fetchFolders]);
+
+//   const handleClick = useCallback(async (index: number) => {
+//     if (!isLoading) {
+//       const useCaseKey = THEME_MAPPINGS[index];
+//       if (!useCaseKey) return;
+
+//       onCaseSelect(useCaseKey); 
+//       setIsChatVisible(true); // Show chat when a topic is selected
+//     }
+//   }, [isLoading, onCaseSelect, setIsChatVisible]);
+
+//   return (
+//     <aside className={styles.sideMenuContainer}>
+//       <div>
+//         <div className={styles.sideMenuHeader}>
+//           <h2>Tópicos de conversa</h2>
+//         </div>
+//         <ul className={styles.chatList}>
+//           {folders.length > 0 ? (
+//             folders.map((folder, index) => (
+//               <li
+//                 key={index}
+//                 className={`${styles.menuOption} ${activeUseCase === THEME_MAPPINGS[index] ? styles.activeOption : ""} ${isLoading ? styles.disabledOption : ""}`}
+//                 onClick={() => handleClick(index)}
+//               >
+//                 <strong>{folder}</strong>
+//                 <p style={{ fontSize: '12px', color: 'gray' }}>
+//                   Descrição do Tópico
+//                 </p>
+//               </li>
+//             ))
+//           ) : (
+//             <li>A carregar Tópicos...</li>
+//           )}
+//         </ul>
+//         {error && <p className={styles.error}>{error}</p>}
+//       </div>
+//     </aside>
+//   );
+// };
+
+// import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// import { USE_CASES } from "../../helpers/constants";
+// import styles from "./SideMenu.module.css";
+// import {
+//   chatApi,
+//   listFoldersApi
+// } from "../../api";
+// import { ChatAppRequest } from "../../api/models";
+// import debounce from 'lodash.debounce';
+// import { useMsal } from "@azure/msal-react";
+// import { useLogin, getToken } from "../../authConfig";
+// import { getHeaders } from '../../api';
+
+// type SideMenuProps = {
+//   activeUseCase: USE_CASES | null;
+//   onCaseSelect: (chatId: USE_CASES) => void;
+//   isLoading: boolean;
+//   setIsChatVisible: (isVisible: boolean) => void; // Function to set chat visibility
+//   onTopicSelect: (topic: string) => void; // New prop to handle topic selection
+// };
+
+// export const THEME_MAPPINGS: USE_CASES[] = [
+//   USE_CASES.THEME_1,
+//   USE_CASES.THEME_2,
+//   USE_CASES.THEME_3,
+//   USE_CASES.THEME_4,
+//   USE_CASES.THEME_5,
+//   USE_CASES.THEME_6
+// ];
+
+// export const SideMenu = ({
+//   activeUseCase,
+//   onCaseSelect,
+//   isLoading,
+//   setIsChatVisible,
+//   onTopicSelect // Add new prop
+// }: SideMenuProps) => {
+//   const [folders, setFolders] = useState<string[]>([]);
+//   const [error, setError] = useState<string | null>(null);
+//   const cacheRef = useRef<Record<string, any>>({});
+//   const client = useLogin ? useMsal().instance : undefined;
+
+//   const fetchFolders = useCallback(async (idToken: string | undefined) => {
+//     try {
+//       const folders = await listFoldersApi(idToken);
+//       setFolders(folders || []);
+//     } catch (error) {
+//       console.error('Error in fetchFolders:', error);
+//       setError(error instanceof Error ? error.message : 'Error fetching folders');
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const token = client ? await getToken(client) : undefined;
+//         await fetchFolders(token);
+//       } catch (error) {
+//         console.error('Error fetching data:', error);
+//       }
+//     };
+
+//     fetchData();
+//   }, [client, fetchFolders]);
+
+//   const handleClick = useCallback(async (index: number) => {
+//     if (!isLoading) {
+//       const useCaseKey = THEME_MAPPINGS[index];
+//       if (!useCaseKey) return;
+
+//       onCaseSelect(useCaseKey);
+//       onTopicSelect(folders[index]); // Pass the selected topic
+//       setIsChatVisible(true); // Show chat when a topic is selected
+//     }
+//   }, [isLoading, onCaseSelect, setIsChatVisible, folders, onTopicSelect]);
+
+//   return (
+//     <aside className={styles.sideMenuContainer}>
+//       <div>
+//         <div className={styles.sideMenuHeader}>
+//           <h2>Tópicos de conversa</h2>
+//         </div>
+//         <ul className={styles.chatList}>
+//           {folders.length > 0 ? (
+//             folders.map((folder, index) => (
+//               <li
+//                 key={index}
+//                 className={`${styles.menuOption} ${activeUseCase === THEME_MAPPINGS[index] ? styles.activeOption : ""} ${isLoading ? styles.disabledOption : ""}`}
+//                 onClick={() => handleClick(index)}
+//               >
+//                 <strong>{folder}</strong>
+//                 <p style={{ fontSize: '12px', color: 'gray' }}>
+//                   Descrição do Tópico
+//                 </p>
+//               </li>
+//             ))
+//           ) : (
+//             <li>A carregar Tópicos...</li>
+//           )}
+//         </ul>
+//         {error && <p className={styles.error}>{error}</p>}
+//       </div>
+//     </aside>
+//   );
+// };
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { USE_CASES } from "../../helpers/constants";
 import styles from "./SideMenu.module.css";
-import {
-  chatApi,
-  listFoldersApi
-} from "../../api";
-import { ChatAppRequest } from "../../api/models";
-import debounce from 'lodash.debounce';
+import { listFoldersApi } from "../../api";
 import { useMsal } from "@azure/msal-react";
 import { useLogin, getToken } from "../../authConfig";
-import { getHeaders } from '../../api';
 
 type SideMenuProps = {
   activeUseCase: USE_CASES | null;
   onCaseSelect: (chatId: USE_CASES) => void;
   isLoading: boolean;
-  setIsChatVisible: (isVisible: boolean) => void; // Function to set chat visibility
+  setIsChatVisible: (isVisible: boolean) => void;
+  onTopicSelect: (topic: string) => void;
 };
 
 export const THEME_MAPPINGS: USE_CASES[] = [
@@ -219,12 +423,11 @@ export const SideMenu = ({
   activeUseCase,
   onCaseSelect,
   isLoading,
-  setIsChatVisible // Function to control chat visibility
+  setIsChatVisible,
+  onTopicSelect
 }: SideMenuProps) => {
   const [folders, setFolders] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isTopicSelected, setIsTopicSelected] = useState<boolean>(false);
-  const cacheRef = useRef<Record<string, any>>({});
   const client = useLogin ? useMsal().instance : undefined;
 
   const fetchFolders = useCallback(async (idToken: string | undefined) => {
@@ -255,10 +458,11 @@ export const SideMenu = ({
       const useCaseKey = THEME_MAPPINGS[index];
       if (!useCaseKey) return;
 
-      onCaseSelect(useCaseKey); 
+      onCaseSelect(useCaseKey);
+      onTopicSelect(encodeURIComponent(folders[index])); // Pass the selected topic
       setIsChatVisible(true); // Show chat when a topic is selected
     }
-  }, [isLoading, onCaseSelect, setIsChatVisible]);
+  }, [isLoading, onCaseSelect, setIsChatVisible, folders, onTopicSelect]);
 
   return (
     <aside className={styles.sideMenuContainer}>
@@ -267,12 +471,17 @@ export const SideMenu = ({
           <h2>Tópicos de conversa</h2>
         </div>
         <ul className={styles.chatList}>
-          {folders.length > 0 ? (
+          {isLoading ? (
+            <li>A carregar Tópicos...</li>
+          ) : (
             folders.map((folder, index) => (
               <li
                 key={index}
-                className={`${styles.menuOption} ${activeUseCase === THEME_MAPPINGS[index] ? styles.activeOption : ""} ${isLoading ? styles.disabledOption : ""}`}
+                className={`${styles.menuOption} ${activeUseCase === THEME_MAPPINGS[index] ? styles.activeOption : ""}`}
                 onClick={() => handleClick(index)}
+                role="button"
+                tabIndex={0}
+                onKeyPress={(e) => e.key === 'Enter' && handleClick(index)}
               >
                 <strong>{folder}</strong>
                 <p style={{ fontSize: '12px', color: 'gray' }}>
@@ -280,8 +489,6 @@ export const SideMenu = ({
                 </p>
               </li>
             ))
-          ) : (
-            <li>A carregar Tópicos...</li>
           )}
         </ul>
         {error && <p className={styles.error}>{error}</p>}
@@ -289,6 +496,3 @@ export const SideMenu = ({
     </aside>
   );
 };
-
-
-

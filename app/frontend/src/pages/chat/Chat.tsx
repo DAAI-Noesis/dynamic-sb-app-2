@@ -67,6 +67,7 @@ type ChatProps = {
   hasUserScrolledUp: boolean;
   setIsLoading: (loading: boolean) => void;
   isChatVisible: boolean;// Add this prop
+  selectedTopic: string;
 };
 
 export interface ChatHandles {
@@ -75,11 +76,14 @@ export interface ChatHandles {
 
 const Chat = forwardRef<ChatHandles, ChatProps>(
   (
-    { activeUseCase, isLoading, hasUserScrolledUp, setIsLoading, isChatVisible }: ChatProps,
+    { activeUseCase, isLoading, hasUserScrolledUp, setIsLoading, isChatVisible, selectedTopic }: ChatProps,
     ref
   ) => {
     const [userFeedback, setUserFeedback] = useState<boolean | null>(null);
     const [feedback, setFeedback] = useState<{ [key: number]: boolean }>({});
+    const [selectedTopico, setSelectedTopico] = useState<string>(selectedTopic); // Default to empty string
+
+
 
 
     
@@ -239,6 +243,22 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
       request: ChatAppRequest,
       token: string | undefined
     ): Promise<Response> => {
+      request.context = {
+        ...request.context,
+        overrides: {
+          ...request.context?.overrides,
+          topico: selectedTopico, // `selectedTopico` is guaranteed to be a string
+          vector_fields: vectorFieldList.length > 0 ? vectorFieldList : [] // Ensure it's always an array
+        }
+      };
+
+
+
+
+
+
+
+
       if (activeUseCase === USE_CASES.THEME_1)
         return await chatApi(request, token);
       if (activeUseCase === USE_CASES.THEME_2)
@@ -365,9 +385,10 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
               suggest_followup_questions: useSuggestFollowupQuestions,
               use_oid_security_filter: useOidSecurityFilter,
               use_groups_security_filter: useGroupsSecurityFilter,
-              vector_fields: vectorFieldList,
+              vector_fields: vectorFieldList || [],
               use_gpt4v: useGPT4V,
               gpt4v_input: gpt4vInput,
+              topico: selectedTopico
               // topico
             }
           },
@@ -430,7 +451,11 @@ const Chat = forwardRef<ChatHandles, ChatProps>(
     useImperativeHandle(ref, () => ({
       clearChat
     }));
-
+    
+    useEffect(() => {
+      setSelectedTopico(selectedTopic);
+    }, [selectedTopic]);
+    
     useEffect(() => {
       chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
     }, [isLoading]);

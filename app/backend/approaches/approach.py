@@ -130,7 +130,7 @@ class Approach(ABC):
             print("entring in security_filter")
             logging.info("build_filter- entring in security_filter")
             filters.append(security_filter)
-        # topico = overrides.get("topico")
+        topico = overrides.get("topico")
         if topico:
             filters.append("topico eq '{}'".format(topico.replace("'", "''")))  # Ensure proper escaping of quotes
         logging.info(f"def buid_filter - Filters:",filters)

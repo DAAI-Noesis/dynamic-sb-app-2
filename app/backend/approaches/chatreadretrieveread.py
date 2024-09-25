@@ -97,10 +97,19 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         top = overrides.get("top", 3)
         minimum_search_score = overrides.get("minimum_search_score", 0.0)
         minimum_reranker_score = overrides.get("minimum_reranker_score", 0.0)
-        topico = overrides.get("topico")
+
+        logging.info(f"overrides dictionary: {overrides}")
+        
 
         filter = self.build_filter(overrides, auth_claims)
         use_semantic_ranker = True if overrides.get("semantic_ranker") and has_text else False
+        topic_filter = ""
+        topico = overrides.get("topico")
+        logging.info(f"topic value: {topico}")
+
+        if topico:
+         topic_filter = f"topico eq '{topico}'"
+        filter = f"{filter} and {topic_filter}"  if filter and topic_filter else topic_filter or filter
 
         original_user_query = messages[-1]["content"]
         if not isinstance(original_user_query, str):
@@ -164,6 +173,8 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
         print(f"filters:", filter) 
         logging.info(f"filters:", filter)
+        print(f"topic filters:", topic_filter) 
+        logging.info(f"topic filters:", topic_filter)
         # Message: 'filters:'
         # Arguments: ("((oids/any(g:search.in(g, '')) or groups/any(g:search.in(g, ''))) or (not oids/any() and not groups/any()))",)
         # eu acho que vai ser ALGO DESTE GENERO:
